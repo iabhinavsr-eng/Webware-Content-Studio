@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Prompt Library</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 56rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .header {
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .helper-text {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        select {
+            height: 3rem;
+            cursor: pointer;
+            border-width: 2px;
+        }
+
+        textarea {
+            min-height: 7.5rem;
+            resize: vertical;
+        }
+
+        .tool-select-group {
+            margin-bottom: 2rem;
+        }
+
+        .tool-select-group label {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .tool-select-group select {
+            border-color: #3b82f6;
+        }
+
+        .fields-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .submit-container {
+            display: flex;
+            justify-content: center;
+            padding-top: 1rem;
+        }
+
+        button[type="submit"] {
+            background-color: #3b82f6;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.75rem 3rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #2563eb;
+        }
+
+        button[type="submit"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+        }
+
+        .output-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .output-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+        }
+
+        .status-badge.success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.raw {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .output-content {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            max-height: 37.5rem;
+            overflow-y: auto;
+        }
+
+        .output-content pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0;
+        }
+
+        .error-content {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .advanced-section {
+            margin-top: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .advanced-section .section-title {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            button[type="submit"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>SEO Prompt Library</h1>
+                <p>Generate SEO-optimized content using AI-powered tools for your business</p>
+            </div>
+
+            <form method="POST" action="/">
+                <div class="tool-select-group">
+                    <label for="tool">Select Tool</label>
+                    <select name="tool" id="tool">
+                        {% for key, name in tool_names.items() %}
+                        <option value="{{ key }}" {% if key == selected_tool %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Business Information</h3>
+                    <div class="fields-grid">
+                        <div class="form-group">
+                            <label for="business_name">Business Name</label>
+                            <input type="text" name="business_name" id="business_name" 
+                                   value="{{ form_data.get('business_name', '') }}" 
+                                   placeholder="e.g., Acme Plumbing Services">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="business_type">Business Type</label>
+                            <input type="text" name="business_type" id="business_type" 
+                                   value="{{ form_data.get('business_type', '') }}" 
+                                   placeholder="e.g., Residential Plumbing Company">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="target_audience">Target Audience</label>
+                            <textarea name="target_audience" id="target_audience" 
+                                      placeholder="Describe your ideal customers...">{{ form_data.get('target_audience', '') }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="products_services_offered">Products/Services Offered</label>
+                            <textarea name="products_services_offered" id="products_services_offered" 
+                                      placeholder="List your main products or services...">{{ form_data.get('products_services_offered', '') }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="service_areas">Service Areas</label>
+                            <textarea name="service_areas" id="service_areas" 
+                                      placeholder="List cities, regions, or areas you serve...">{{ form_data.get('service_areas', '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section advanced-section">
+                    <h3 class="section-title">Advanced Fields (used by specific tools)</h3>
+                    <div class="fields-grid">
+                        <div class="form-group">
+                            <label for="icp">ICP Data (JSON)</label>
+                            <textarea name="icp" id="icp" 
+                                      placeholder="Paste ICP JSON from the ICP & UVP Generator...">{{ form_data.get('icp', '') }}</textarea>
+                            <p class="helper-text">Used by GBP Builder, Site Structure, and other tools</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="uvp">UVP Data (JSON or text)</label>
+                            <textarea name="uvp" id="uvp" 
+                                      placeholder="Paste UVP data from the ICP & UVP Generator...">{{ form_data.get('uvp', '') }}</textarea>
+                            <p class="helper-text">Used by GBP Builder, Site Structure, and other tools</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new_gbp_category">New GBP Category</label>
+                            <input type="text" name="new_gbp_category" id="new_gbp_category" 
+                                   value="{{ form_data.get('new_gbp_category', '') }}" 
+                                   placeholder="e.g., Emergency Plumber">
+                            <p class="helper-text">Used by New GBP Category Keywords tool</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="requested_page_name">Requested Page Name</label>
+                            <input type="text" name="requested_page_name" id="requested_page_name" 
+                                   value="{{ form_data.get('requested_page_name', '') }}" 
+                                   placeholder="e.g., Water Heater Repair">
+                            <p class="helper-text">Used by Single Page SEO Regenerator</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="requested_page_type">Requested Page Type</label>
+                            <input type="text" name="requested_page_type" id="requested_page_type" 
+                                   value="{{ form_data.get('requested_page_type', '') }}" 
+                                   placeholder="e.g., Service Page, Location Page, Blog Post">
+                            <p class="helper-text">Used by Single Page SEO Regenerator</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="other_pages_json">Other Pages (JSON)</label>
+                            <textarea name="other_pages_json" id="other_pages_json" 
+                                      placeholder="JSON array of existing pages for internal linking...">{{ form_data.get('other_pages_json', '') }}</textarea>
+                            <p class="helper-text">Used by Single Page SEO Regenerator for internal linking</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="previous_pages">Previous Pages (JSON)</label>
+                            <textarea name="previous_pages" id="previous_pages" 
+                                      placeholder="JSON list of previously generated pages...">{{ form_data.get('previous_pages', '') }}</textarea>
+                            <p class="helper-text">Used by Batch Regenerator for context</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="batch_pages">Batch Pages</label>
+                            <textarea name="batch_pages" id="batch_pages" 
+                                      placeholder="List of pages to regenerate or audit...">{{ form_data.get('batch_pages', '') }}</textarea>
+                            <p class="helper-text">Used by SEO Keyword Recheck / Batch Regenerator</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="submit">Generate SEO Content</button>
+                </div>
+            </form>
+
+            {% if result or error %}
+            <div class="output-section">
+                <div class="output-header">
+                    <h2>Output</h2>
+                    {% if error %}
+                    <span class="status-badge error">Error</span>
+                    {% elif is_json %}
+                    <span class="status-badge success">Parsed JSON</span>
+                    {% else %}
+                    <span class="status-badge raw">Raw Output</span>
+                    {% endif %}
+                </div>
+                
+                {% if error %}
+                <div class="error-content">
+                    <pre>{{ error }}</pre>
+                </div>
+                {% else %}
+                <div class="output-content">
+                    <pre>{{ result }}</pre>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
