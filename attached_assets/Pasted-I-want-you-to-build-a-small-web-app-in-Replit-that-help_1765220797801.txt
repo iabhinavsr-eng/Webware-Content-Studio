@@ -1,0 +1,114 @@
+I want you to build a small web app in Replit that helps me use a library of AI prompts for building SEO-optimised websites.
+
+Tech stack
+
+Backend: Python + Flask
+
+Frontend: Simple HTML/CSS (Jinja templates are fine)
+
+Use the OpenAI API. Read the key from an environment variable called OPENAI_API_KEY.
+
+Goal of the app
+The app should let me:
+
+Enter basic business info (business name, type, target audience, products/services, service areas).
+
+Choose which “tool” to run from a dropdown.
+
+The backend should build a specific prompt for the OpenAI model based on that tool, call the API, and show the JSON result nicely formatted.
+
+Tools (features) to support
+Implement these tools as options in a dropdown:
+
+ICP & UVP Generator
+
+GBP Categories & Description Builder
+
+New GBP Category Keywords
+
+Full Site Structure SEO Builder
+
+Single Page SEO Regenerator
+
+SEO Keyword Recheck / Batch Regenerator
+
+Each tool should:
+
+Use a dedicated Python function in a prompts.py file (for example: build_icp_uvp_prompt(data), build_gbp_builder_prompt(data), etc.).
+
+That function returns a dict with two keys: system and user (the system prompt and user content for the OpenAI chat completion).
+
+The Flask route reads the form input, decides which builder function to use based on the selected tool, calls the OpenAI API with temperature=0.2, and returns the response.
+
+Data handling
+Common form fields (always on the page):
+
+business_name (text)
+
+business_type (text)
+
+target_audience (textarea)
+
+products_services_offered (textarea)
+
+service_areas (textarea)
+
+Extra fields for advanced tools:
+
+icp (textarea) – JSON from the ICP tool
+
+uvp (textarea) – JSON or text from the UVP
+
+previous_pages (textarea) – JSON list of pages
+
+requested_page_name (text)
+
+requested_page_type (text)
+
+other_pages_json (textarea)
+
+batch_pages (textarea)
+
+new_gbp_category (text)
+
+It’s okay if all fields are visible all the time; the Python code can just ignore what it doesn’t need for a given tool.
+
+OpenAI call
+
+Use the official openai Python client (latest version).
+
+Create a helper function like call_openai(system_prompt, user_prompt, model="gpt-4.1-mini") that returns the model’s text.
+
+The Flask route should try to parse the response as JSON.
+
+If parsing succeeds, pretty-print the JSON in a <pre> block.
+
+If parsing fails, show the raw text so I can debug the prompt.
+
+UI requirements
+
+Single page with:
+
+A dropdown to select the tool.
+
+The input fields listed above.
+
+A submit button.
+
+Below the form, show:
+
+“Parsed JSON Output” (if valid JSON)
+
+Otherwise “Raw Model Output”.
+
+Files to create
+
+main.py – Flask app and OpenAI integration.
+
+prompts.py – all the prompt builder functions mentioned above.
+
+templates/index.html – main template with the form and result sections.
+
+Add a requirements.txt including at least: flask and openai.
+
+Please scaffold everything, including the HTML template, and make sure I can run it in Replit with “Run” and open the web view.
