@@ -1,0 +1,86 @@
+You already started building a Flask + OpenAI web app for me, but it has way too many fields (GBP categories, page type, etc.).
+I want you to simplify this project into a very small “prompt tester” with ONLY three inputs plus an optional model selector.
+
+Please edit the existing code (don’t start a new project) as follows:
+
+1. Remove all the extra stuff
+
+Delete the dropdown with multiple tools.
+
+Remove all “advanced” fields such as:
+
+New GBP Category
+
+Requested Page Name / Type
+
+Other Pages JSON
+
+Previous Pages, Batch Pages, etc.
+
+Remove any backend code that references those fields or tools.
+
+2. Form fields I DO want
+
+In templates/index.html, keep a single form with:
+
+A large textarea named icp
+
+Label: “ICP (JSON or text)”
+
+A large textarea named uvp
+
+Label: “UVP (JSON or text)”
+
+A large textarea named prompt_instructions
+
+Label: “Prompt / Instructions (SYSTEM message)”
+
+Optional: a small text input or select named model with default value gpt-4.1-mini.
+
+A single submit button: “Run Prompt”.
+
+Do NOT add any other inputs.
+
+3. Backend behaviour (main.py)
+
+Keep using Flask and the OpenAI Python client, reading the API key from OPENAI_API_KEY.
+
+On POST:
+
+Read icp, uvp, prompt_instructions, and model (if empty, use gpt-4.1-mini).
+
+Use prompt_instructions as the system message.
+
+Build the user message as a string like:
+
+Here is the current data:\\n\\nICP:\\n{icp}\\n\\nUVP:\\n{uvp}
+
+Call client.chat.completions.create with:
+
+model = chosen model
+
+temperature = 0.2
+
+messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_message}]
+
+Return the assistant’s reply to the template as model_output.
+
+4. Output display
+
+In index.html:
+
+Below the form, if model_output exists, show:
+
+Heading: “Model Output”
+
+<pre>{{ model_output }}</pre>
+
+Keep the values of icp, uvp, and prompt_instructions in the form after submit so I can tweak and run again.
+
+5. Cleanup
+
+Remove any unused files like prompts.py with multiple builders if they are no longer needed, or leave only a simple helper if you prefer.
+
+Make sure the app still runs with the existing Run button and serves on 0.0.0.0:8080.
+
+In summary: turn this into a minimal prompt-tester where I paste ICP + UVP + a prompt, click Run, and see the model’s response.
