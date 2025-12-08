@@ -1,35 +1,22 @@
-# SEO Prompt Library
+# Prompt Tester
 
-A Flask-based web application that helps generate SEO-optimized content using AI-powered tools.
+A minimal Flask web application for testing prompts with OpenAI's API.
 
 ## Overview
 
-This application provides a library of 6 specialized SEO tools powered by OpenAI's GPT-4.1-mini model:
-
-1. **ICP & UVP Generator** - Creates Ideal Customer Profiles and Unique Value Propositions
-2. **GBP Categories & Description Builder** - Optimizes Google Business Profile content
-3. **New GBP Category Keywords** - Generates keyword lists for GBP categories
-4. **Full Site Structure SEO Builder** - Designs complete website architecture
-5. **Single Page SEO Regenerator** - Creates SEO elements for individual pages
-6. **SEO Keyword Recheck / Batch Regenerator** - Audits and regenerates multiple pages
-
-## Features
-
-- **Tool-specific field visibility** - Shows only relevant form fields for each tool
-- **Preset templates** - Quick-start templates for 8 common business types (plumber, dentist, restaurant, lawyer, realtor, HVAC, salon, fitness)
-- **JSON validation** - Real-time validation with error highlighting for JSON input fields
-- **Export functionality** - Copy to clipboard or download outputs as JSON files
-- **Response history** - Database-backed storage of all generations with view/download capabilities
+This is a simple prompt tester where you can:
+1. Paste your ICP (Ideal Customer Profile)
+2. Paste your UVP (Unique Value Proposition)
+3. Enter your prompt/instructions (system message)
+4. Optionally select a model (defaults to gpt-4.1-mini)
+5. Click "Run Prompt" to see the model's response
 
 ## Project Structure
 
 ```
-├── main.py              # Flask routes and OpenAI integration
-├── app.py               # Flask app configuration and database setup
-├── models.py            # SQLAlchemy models (GenerationHistory)
-├── prompts.py           # Prompt builder functions for each SEO tool
+├── main.py              # Flask app with OpenAI integration
 ├── templates/
-│   └── index.html       # Main UI template with form and outputs
+│   └── index.html       # Main UI template
 └── design_guidelines.md # Frontend design specifications
 ```
 
@@ -37,14 +24,6 @@ This application provides a library of 6 specialized SEO tools powered by OpenAI
 
 - `OPENAI_API_KEY` - Required for OpenAI API access
 - `SESSION_SECRET` - Flask session secret
-- `DATABASE_URL` - PostgreSQL database connection
-
-## Technical Stack
-
-- **Backend**: Python 3.11, Flask, Flask-SQLAlchemy
-- **Database**: PostgreSQL (for response history)
-- **AI**: OpenAI GPT-4.1-mini with temperature=0.2 for consistent outputs
-- **Frontend**: HTML/CSS with vanilla JavaScript, Inter font, JetBrains Mono for code
 
 ## Running the Application
 
@@ -53,9 +32,18 @@ The application runs on port 5000 using Gunicorn:
 gunicorn --bind 0.0.0.0:5000 --reload main:app
 ```
 
-## Recent Changes
+## How It Works
 
-- **2024-12-08**: Initial implementation with all 6 SEO tools
-- **2024-12-08**: Added tool-specific field visibility, presets, JSON validation
-- **2024-12-08**: Implemented response history with PostgreSQL persistence
-- **2024-12-08**: Added export/download functionality for outputs
+1. The system message is your `prompt_instructions`
+2. The user message is built as:
+   ```
+   Here is the current data:
+   
+   ICP:
+   {your icp}
+   
+   UVP:
+   {your uvp}
+   ```
+3. The response is displayed below the form
+4. Your inputs are preserved so you can tweak and run again
