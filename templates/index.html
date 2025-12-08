@@ -71,6 +71,10 @@
             margin-bottom: 1.5rem;
         }
 
+        .form-group.hidden {
+            display: none;
+        }
+
         label {
             display: block;
             font-weight: 500;
@@ -106,6 +110,24 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
+        input.json-error,
+        textarea.json-error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        input.json-valid,
+        textarea.json-valid {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+        }
+
+        .json-error-message {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
         select {
             height: 3rem;
             cursor: pointer;
@@ -130,6 +152,24 @@
             border-color: #3b82f6;
         }
 
+        .preset-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background-color: #f1f5f9;
+            border-radius: 0.5rem;
+        }
+
+        .preset-section label {
+            font-size: 0.875rem;
+            color: #475569;
+        }
+
+        .preset-section select {
+            height: 2.5rem;
+            border-width: 1px;
+            border-color: #cbd5e1;
+        }
+
         .fields-grid {
             display: grid;
             gap: 1.5rem;
@@ -141,7 +181,8 @@
             padding-top: 1rem;
         }
 
-        button[type="submit"] {
+        button[type="submit"],
+        .btn {
             background-color: #3b82f6;
             color: white;
             font-size: 1rem;
@@ -153,13 +194,28 @@
             transition: background-color 0.2s;
         }
 
-        button[type="submit"]:hover {
+        button[type="submit"]:hover,
+        .btn:hover {
             background-color: #2563eb;
         }
 
-        button[type="submit"]:focus {
+        button[type="submit"]:focus,
+        .btn:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: #64748b;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
         }
 
         .output-section {
@@ -173,11 +229,18 @@
             align-items: center;
             gap: 0.75rem;
             margin-bottom: 1rem;
+            flex-wrap: wrap;
         }
 
         .output-header h2 {
             font-size: 1.25rem;
             font-weight: 600;
+        }
+
+        .output-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 0.5rem;
         }
 
         .status-badge {
@@ -239,6 +302,48 @@
             font-size: 1rem;
         }
 
+        .history-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .history-item {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-item-tool {
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .history-item-time {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .history-item-business {
+            font-size: 0.875rem;
+            color: #475569;
+        }
+
+        .history-item-actions {
+            margin-top: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
         @media (max-width: 640px) {
             .container {
                 padding: 1rem;
@@ -251,6 +356,12 @@
             button[type="submit"] {
                 width: 100%;
             }
+
+            .output-actions {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -262,13 +373,28 @@
                 <p>Generate SEO-optimized content using AI-powered tools for your business</p>
             </div>
 
-            <form method="POST" action="/">
+            <form method="POST" action="/" id="seoForm">
                 <div class="tool-select-group">
                     <label for="tool">Select Tool</label>
                     <select name="tool" id="tool">
                         {% for key, name in tool_names.items() %}
                         <option value="{{ key }}" {% if key == selected_tool %}selected{% endif %}>{{ name }}</option>
                         {% endfor %}
+                    </select>
+                </div>
+
+                <div class="preset-section">
+                    <label for="preset">Quick Start: Load Business Preset</label>
+                    <select name="preset" id="preset">
+                        <option value="">-- Select a preset --</option>
+                        <option value="plumber">Plumbing Company</option>
+                        <option value="dentist">Dental Practice</option>
+                        <option value="restaurant">Restaurant</option>
+                        <option value="lawyer">Law Firm</option>
+                        <option value="realtor">Real Estate Agent</option>
+                        <option value="hvac">HVAC Company</option>
+                        <option value="salon">Hair Salon / Spa</option>
+                        <option value="fitness">Fitness / Gym</option>
                     </select>
                 </div>
 
@@ -309,66 +435,66 @@
                     </div>
                 </div>
 
-                <div class="form-section advanced-section">
-                    <h3 class="section-title">Advanced Fields (used by specific tools)</h3>
+                <div class="form-section advanced-section" id="advancedSection">
+                    <h3 class="section-title">Advanced Fields (tool-specific)</h3>
                     <div class="fields-grid">
-                        <div class="form-group">
+                        <div class="form-group" id="field-icp" data-tools="gbp_builder,site_structure,single_page,batch_regenerator">
                             <label for="icp">ICP Data (JSON)</label>
-                            <textarea name="icp" id="icp" 
+                            <textarea name="icp" id="icp" class="json-field"
                                       placeholder="Paste ICP JSON from the ICP & UVP Generator...">{{ form_data.get('icp', '') }}</textarea>
                             <p class="helper-text">Used by GBP Builder, Site Structure, and other tools</p>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="field-uvp" data-tools="gbp_builder,site_structure,single_page,batch_regenerator">
                             <label for="uvp">UVP Data (JSON or text)</label>
-                            <textarea name="uvp" id="uvp" 
+                            <textarea name="uvp" id="uvp" class="json-field"
                                       placeholder="Paste UVP data from the ICP & UVP Generator...">{{ form_data.get('uvp', '') }}</textarea>
                             <p class="helper-text">Used by GBP Builder, Site Structure, and other tools</p>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="field-new_gbp_category" data-tools="gbp_keywords">
                             <label for="new_gbp_category">New GBP Category</label>
                             <input type="text" name="new_gbp_category" id="new_gbp_category" 
                                    value="{{ form_data.get('new_gbp_category', '') }}" 
                                    placeholder="e.g., Emergency Plumber">
-                            <p class="helper-text">Used by New GBP Category Keywords tool</p>
+                            <p class="helper-text">Required for New GBP Category Keywords tool</p>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="field-requested_page_name" data-tools="single_page">
                             <label for="requested_page_name">Requested Page Name</label>
                             <input type="text" name="requested_page_name" id="requested_page_name" 
                                    value="{{ form_data.get('requested_page_name', '') }}" 
                                    placeholder="e.g., Water Heater Repair">
-                            <p class="helper-text">Used by Single Page SEO Regenerator</p>
+                            <p class="helper-text">Required for Single Page SEO Regenerator</p>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="field-requested_page_type" data-tools="single_page">
                             <label for="requested_page_type">Requested Page Type</label>
                             <input type="text" name="requested_page_type" id="requested_page_type" 
                                    value="{{ form_data.get('requested_page_type', '') }}" 
                                    placeholder="e.g., Service Page, Location Page, Blog Post">
-                            <p class="helper-text">Used by Single Page SEO Regenerator</p>
+                            <p class="helper-text">Required for Single Page SEO Regenerator</p>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="field-other_pages_json" data-tools="single_page">
                             <label for="other_pages_json">Other Pages (JSON)</label>
-                            <textarea name="other_pages_json" id="other_pages_json" 
+                            <textarea name="other_pages_json" id="other_pages_json" class="json-field"
                                       placeholder="JSON array of existing pages for internal linking...">{{ form_data.get('other_pages_json', '') }}</textarea>
-                            <p class="helper-text">Used by Single Page SEO Regenerator for internal linking</p>
+                            <p class="helper-text">Used for internal linking suggestions</p>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="field-previous_pages" data-tools="batch_regenerator">
                             <label for="previous_pages">Previous Pages (JSON)</label>
-                            <textarea name="previous_pages" id="previous_pages" 
+                            <textarea name="previous_pages" id="previous_pages" class="json-field"
                                       placeholder="JSON list of previously generated pages...">{{ form_data.get('previous_pages', '') }}</textarea>
-                            <p class="helper-text">Used by Batch Regenerator for context</p>
+                            <p class="helper-text">Context for Batch Regenerator</p>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="field-batch_pages" data-tools="batch_regenerator">
                             <label for="batch_pages">Batch Pages</label>
                             <textarea name="batch_pages" id="batch_pages" 
                                       placeholder="List of pages to regenerate or audit...">{{ form_data.get('batch_pages', '') }}</textarea>
-                            <p class="helper-text">Used by SEO Keyword Recheck / Batch Regenerator</p>
+                            <p class="helper-text">Required for SEO Keyword Recheck / Batch Regenerator</p>
                         </div>
                     </div>
                 </div>
@@ -389,6 +515,13 @@
                     {% else %}
                     <span class="status-badge raw">Raw Output</span>
                     {% endif %}
+                    
+                    {% if result and not error %}
+                    <div class="output-actions">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard()">Copy</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="downloadJSON()">Download</button>
+                    </div>
+                    {% endif %}
                 </div>
                 
                 {% if error %}
@@ -397,12 +530,193 @@
                 </div>
                 {% else %}
                 <div class="output-content">
-                    <pre>{{ result }}</pre>
+                    <pre id="outputContent">{{ result }}</pre>
                 </div>
                 {% endif %}
             </div>
             {% endif %}
+
+            {% if history %}
+            <div class="history-section">
+                <h3 class="section-title">Recent Generations</h3>
+                {% for item in history %}
+                <div class="history-item">
+                    <div class="history-item-header">
+                        <span class="history-item-tool">{{ tool_names.get(item.tool, item.tool) }}</span>
+                        <span class="history-item-time">{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                    <div class="history-item-business">{{ item.business_name or 'Unnamed Business' }}</div>
+                    <div class="history-item-actions">
+                        <a href="/history/{{ item.id }}" class="btn btn-secondary btn-sm">View</a>
+                        <a href="/history/{{ item.id }}/download" class="btn btn-secondary btn-sm">Download</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
     </div>
+
+    <script>
+        const PRESETS = {
+            plumber: {
+                business_name: "Example Plumbing Co.",
+                business_type: "Residential & Commercial Plumbing Services",
+                target_audience: "Homeowners and property managers in need of plumbing repairs, installations, and maintenance. Typically 30-65 years old, middle to upper-middle income, value reliability and quick response times.",
+                products_services_offered: "Emergency plumbing repairs, drain cleaning, water heater installation and repair, pipe repair and replacement, bathroom and kitchen plumbing, sewer line services, leak detection, fixture installation",
+                service_areas: "Los Angeles, CA and surrounding areas including Pasadena, Glendale, Burbank, Santa Monica"
+            },
+            dentist: {
+                business_name: "Example Dental Care",
+                business_type: "General & Cosmetic Dentistry Practice",
+                target_audience: "Families and individuals seeking quality dental care, ages 18-65+, health-conscious, value preventive care and aesthetics, typically have dental insurance or can afford out-of-pocket care.",
+                products_services_offered: "General dentistry, teeth cleaning, fillings, crowns and bridges, dental implants, teeth whitening, veneers, Invisalign, root canals, emergency dental care, pediatric dentistry",
+                service_areas: "Chicago, IL and surrounding suburbs including Evanston, Skokie, Oak Park, Naperville"
+            },
+            restaurant: {
+                business_name: "Example Bistro",
+                business_type: "Farm-to-Table Restaurant",
+                target_audience: "Food enthusiasts aged 25-55, professionals and couples seeking quality dining experiences, value locally-sourced ingredients, willing to pay premium for quality, interested in sustainable dining.",
+                products_services_offered: "Lunch and dinner service, seasonal tasting menus, wine pairing, private dining events, catering services, weekend brunch, happy hour specials",
+                service_areas: "San Francisco, CA - Located in the Mission District, serving the greater Bay Area"
+            },
+            lawyer: {
+                business_name: "Example Law Group",
+                business_type: "Personal Injury Law Firm",
+                target_audience: "Individuals who have been injured in accidents (car accidents, slip and falls, workplace injuries), ages 25-65, seeking fair compensation, often stressed and need compassionate legal guidance.",
+                products_services_offered: "Personal injury claims, car accident cases, motorcycle accidents, truck accidents, slip and fall cases, workplace injury claims, wrongful death claims, free case consultations",
+                service_areas: "Houston, TX and surrounding Harris County, including Katy, Sugar Land, Pearland, The Woodlands"
+            },
+            realtor: {
+                business_name: "Example Realty",
+                business_type: "Residential Real Estate Agency",
+                target_audience: "First-time homebuyers, families looking to upgrade, retirees downsizing, investors seeking rental properties. Ages 28-65, varying income levels, seeking knowledgeable and trustworthy guidance.",
+                products_services_offered: "Buyer representation, seller representation, home valuations, market analysis, investment property consultation, relocation services, new construction guidance",
+                service_areas: "Austin, TX metro area including Round Rock, Cedar Park, Georgetown, Pflugerville, Dripping Springs"
+            },
+            hvac: {
+                business_name: "Example Heating & Cooling",
+                business_type: "HVAC Installation and Repair Company",
+                target_audience: "Homeowners and business owners needing heating and cooling solutions, ages 30-70, value comfort and energy efficiency, often in urgent need during extreme weather.",
+                products_services_offered: "AC installation and repair, furnace installation and repair, heat pump services, duct cleaning, indoor air quality solutions, preventive maintenance plans, 24/7 emergency service",
+                service_areas: "Phoenix, AZ and surrounding areas including Scottsdale, Tempe, Mesa, Chandler, Gilbert"
+            },
+            salon: {
+                business_name: "Example Salon & Spa",
+                business_type: "Full-Service Hair Salon and Day Spa",
+                target_audience: "Women and men aged 20-60 seeking professional hair and beauty services, value self-care and personal appearance, middle to upper income, appreciate relaxing atmosphere.",
+                products_services_offered: "Haircuts and styling, hair coloring, highlights and balayage, keratin treatments, facials, massage therapy, manicures and pedicures, waxing, bridal services",
+                service_areas: "Miami, FL - Located in Coral Gables, serving Miami-Dade County"
+            },
+            fitness: {
+                business_name: "Example Fitness Studio",
+                business_type: "Boutique Fitness Gym and Personal Training",
+                target_audience: "Health-conscious adults aged 22-55, professionals seeking convenient workout options, interested in personalized fitness guidance, value community and accountability.",
+                products_services_offered: "Personal training, group fitness classes, HIIT workouts, yoga classes, strength training, nutrition coaching, weight loss programs, corporate wellness programs",
+                service_areas: "Denver, CO and surrounding areas including Boulder, Lakewood, Aurora, Littleton"
+            }
+        };
+
+        const TOOL_FIELDS = {
+            icp_uvp: [],
+            gbp_builder: ['field-icp', 'field-uvp'],
+            gbp_keywords: ['field-new_gbp_category'],
+            site_structure: ['field-icp', 'field-uvp'],
+            single_page: ['field-icp', 'field-uvp', 'field-requested_page_name', 'field-requested_page_type', 'field-other_pages_json'],
+            batch_regenerator: ['field-icp', 'field-uvp', 'field-previous_pages', 'field-batch_pages']
+        };
+
+        function updateFieldVisibility() {
+            const tool = document.getElementById('tool').value;
+            const relevantFields = TOOL_FIELDS[tool] || [];
+            const advancedSection = document.getElementById('advancedSection');
+            
+            document.querySelectorAll('#advancedSection .form-group').forEach(field => {
+                if (relevantFields.includes(field.id)) {
+                    field.classList.remove('hidden');
+                } else {
+                    field.classList.add('hidden');
+                }
+            });
+
+            const hasVisibleFields = relevantFields.length > 0;
+            advancedSection.style.display = hasVisibleFields ? 'block' : 'none';
+        }
+
+        function loadPreset() {
+            const preset = document.getElementById('preset').value;
+            if (preset && PRESETS[preset]) {
+                const data = PRESETS[preset];
+                document.getElementById('business_name').value = data.business_name;
+                document.getElementById('business_type').value = data.business_type;
+                document.getElementById('target_audience').value = data.target_audience;
+                document.getElementById('products_services_offered').value = data.products_services_offered;
+                document.getElementById('service_areas').value = data.service_areas;
+            }
+        }
+
+        function validateJSON(textarea) {
+            const value = textarea.value.trim();
+            const errorDiv = textarea.parentElement.querySelector('.json-error-message');
+            
+            if (errorDiv) {
+                errorDiv.remove();
+            }
+            
+            textarea.classList.remove('json-error', 'json-valid');
+            
+            if (!value) {
+                return true;
+            }
+            
+            try {
+                JSON.parse(value);
+                textarea.classList.add('json-valid');
+                return true;
+            } catch (e) {
+                textarea.classList.add('json-error');
+                const msg = document.createElement('p');
+                msg.className = 'json-error-message';
+                msg.textContent = 'Invalid JSON: ' + e.message;
+                textarea.parentElement.appendChild(msg);
+                return false;
+            }
+        }
+
+        function copyToClipboard() {
+            const content = document.getElementById('outputContent').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        function downloadJSON() {
+            const content = document.getElementById('outputContent').textContent;
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'seo-output-' + new Date().toISOString().slice(0, 10) + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('tool').addEventListener('change', updateFieldVisibility);
+            document.getElementById('preset').addEventListener('change', loadPreset);
+            
+            document.querySelectorAll('.json-field').forEach(field => {
+                field.addEventListener('blur', function() {
+                    validateJSON(this);
+                });
+            });
+            
+            updateFieldVisibility();
+        });
+    </script>
 </body>
 </html>

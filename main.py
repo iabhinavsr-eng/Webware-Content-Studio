@@ -2,15 +2,15 @@ import json
 import logging
 import os
 
-from flask import Flask, render_template, request
+from flask import render_template, request, redirect, url_for, Response
 from openai import OpenAI
 
+from app import app, db
+from models import GenerationHistory
 from prompts import TOOL_BUILDERS, TOOL_NAMES
 
 logging.basicConfig(level=logging.DEBUG)
 
-app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET")
 
 def get_openai_client():
     """Get OpenAI client, raising error if API key not configured."""
@@ -79,12 +79,25 @@ def index():
                 except json.JSONDecodeError:
                     result = raw_result
                     is_json = False
+                
+                history_entry = GenerationHistory(
+                    tool=selected_tool,
+                    business_name=form_data.get("business_name"),
+                    business_type=form_data.get("business_type"),
+                    input_data=json.dumps(form_data),
+                    output_data=result,
+                    is_json=is_json
+                )
+                db.session.add(history_entry)
+                db.session.commit()
                     
             except Exception as e:
                 error = str(e)
                 logging.error(f"Error processing request: {e}")
         else:
             error = f"Unknown tool: {selected_tool}"
+
+    history = GenerationHistory.query.order_by(GenerationHistory.created_at.desc()).limit(10).all()
 
     return render_template(
         "index.html",
@@ -94,6 +107,36 @@ def index():
         is_json=is_json,
         error=error,
         form_data=form_data,
+        history=history,
+    )
+
+
+@app.route("/history/<int:history_id>")
+def view_history(history_id):
+    entry = GenerationHistory.query.get_or_404(history_id)
+    form_data = json.loads(entry.input_data) if entry.input_data else {}
+    
+    return render_template(
+        "index.html",
+        tool_names=TOOL_NAMES,
+        selected_tool=entry.tool,
+        result=entry.output_data,
+        is_json=entry.is_json,
+        error=None,
+        form_data=form_data,
+        history=GenerationHistory.query.order_by(GenerationHistory.created_at.desc()).limit(10).all(),
+    )
+
+
+@app.route("/history/<int:history_id>/download")
+def download_history(history_id):
+    entry = GenerationHistory.query.get_or_404(history_id)
+    filename = f"seo-{entry.tool}-{entry.created_at.strftime('%Y%m%d-%H%M%S')}.json"
+    
+    return Response(
+        entry.output_data,
+        mimetype="application/json",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
 
