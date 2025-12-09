@@ -278,6 +278,59 @@ OUTPUT FORMAT (JSON):
   }
 }"""
 
+DEFAULT_SERVICES_OVERVIEW_PROMPT = """SYSTEM PROMPT - Services Overview Page Builder
+
+Role:
+You are an expert SEO website copywriter specialising in services overview pages.
+Your job is to generate a comprehensive services landing page that showcases multiple service offerings.
+
+RULES (MUST FOLLOW ALL):
+Language & Style
+
+British English only.
+
+Standard ASCII only (no curly quotes, emojis, special characters).
+
+Professional, informative, trustworthy tone.
+
+Mention the business name no more than once.
+
+Do NOT include: phone numbers, emails, URLs, pricing, awards, unverifiable claims.
+
+SEO & Content Requirements
+
+Use the provided ICP and UVP to inform the content.
+
+Naturally integrate the location into headlines and content.
+
+Each service description should be unique and compelling.
+
+Focus on benefits and value to the customer.
+
+OUTPUT FORMAT (JSON):
+
+{
+  "hero_section": {
+    "h1": "[Service Category] Services in [City], Delivered with Skill and Transparency",
+    "intro_paragraph": "3-4 sentences describing what services the business provides, the location served, and the key value proposition."
+  },
+  "services_section": {
+    "headline": "Our [Service Category] Services in [City]",
+    "services": [
+      {"title": "Service 1 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."},
+      {"title": "Service 2 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."},
+      {"title": "Service 3 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."},
+      {"title": "Service 4 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."},
+      {"title": "Service 5 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."}
+    ]
+  },
+  "cta_banner": {
+    "headline": "Ready to [action verb] your [benefit/outcome] with expertise?",
+    "paragraph": "2-3 sentences about staying informed, getting updates on services, or encouraging consultation.",
+    "button_text": "Request a private consultation"
+  }
+}"""
+
 
 def get_openai_client():
     """Get OpenAI client, raising error if API key not configured."""
@@ -307,6 +360,8 @@ def get_default_prompt(page_type):
         return DEFAULT_SERVICE_PAGE_PROMPT
     elif page_type == "service_area":
         return DEFAULT_SERVICE_AREA_PROMPT
+    elif page_type == "services_overview":
+        return DEFAULT_SERVICES_OVERVIEW_PROMPT
     return DEFAULT_HOMEPAGE_PROMPT
 
 
@@ -363,6 +418,22 @@ Important: Generate content specifically for the {service_name} service. Focus o
 - Benefits specific to this service
 - Common customer questions about this service
 - Process and methodology for this service
+
+ICP:
+{icp}
+
+UVP:
+{uvp}"""
+            elif page_type == "services_overview" and city:
+                user_message = f"""Here is the current data:
+
+TARGET LOCATION: {city}
+
+Important: Generate a services overview page for {city}. Create compelling descriptions for 5 different services that this business offers. Each service should:
+- Have a clear, specific title
+- Include a detailed 4-6 sentence description
+- Focus on customer benefits and outcomes
+- Be unique and not repeat content from other services
 
 ICP:
 {icp}

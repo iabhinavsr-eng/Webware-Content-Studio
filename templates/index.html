@@ -144,6 +144,7 @@
                     <button type="button" class="preset-btn active" data-preset="homepage" onclick="loadPreset('homepage')">Homepage</button>
                     <button type="button" class="preset-btn" data-preset="service_page" onclick="loadPreset('service_page')">Service Page</button>
                     <button type="button" class="preset-btn" data-preset="service_area" onclick="loadPreset('service_area')">Service Area</button>
+                    <button type="button" class="preset-btn" data-preset="services_overview" onclick="loadPreset('services_overview')">Services Overview</button>
                 </div>
 
                 <input type="hidden" name="page_type" id="page_type" value="{{ page_type or 'homepage' }}">
@@ -374,6 +375,56 @@
                     <div class="footer-bar"></div>
                 </div>
 
+                {% elif parsed_output and page_type == 'services_overview' %}
+                <!-- SERVICES OVERVIEW PAGE PREVIEW -->
+                <div class="website-preview">
+                    <div class="hero-section" style="background: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1200 400\"><rect fill=\"%23374151\" width=\"1200\" height=\"400\"/></svg>') center/cover; padding: 4rem 2rem;">
+                        <h1 style="font-size: 2.25rem; font-weight: 700; line-height: 1.2; margin-bottom: 1rem;">{{ parsed_output.hero_section.h1 if parsed_output.hero_section else 'Services Overview' }}</h1>
+                        <p style="font-size: 0.95rem; opacity: 0.9; max-width: 800px;">{{ parsed_output.hero_section.intro_paragraph if parsed_output.hero_section else '' }}</p>
+                    </div>
+
+                    {% if parsed_output.services_section %}
+                    <div class="services-overview-section" style="padding: 3rem 2rem; background: white;">
+                        <h2 style="font-size: 1.75rem; font-style: italic; text-align: center; margin-bottom: 2.5rem;">{{ parsed_output.services_section.headline }}</h2>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1000px; margin: 0 auto;">
+                            {% for service in parsed_output.services_section.services[:3] %}
+                            <div class="service-overview-card" style="text-align: center; padding: 1rem;">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: #1e293b;">{{ service.title }}</h3>
+                                <p style="font-size: 0.85rem; color: #475569; line-height: 1.6; margin-bottom: 1rem;">{{ service.description }}</p>
+                                <button style="background: #1e293b; color: white; border: none; padding: 0.6rem 1.25rem; font-size: 0.8rem; font-weight: 600; cursor: pointer;">Read more</button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if parsed_output.services_section.services|length > 3 %}
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; max-width: 700px; margin: 2rem auto 0;">
+                            {% for service in parsed_output.services_section.services[3:] %}
+                            <div class="service-overview-card" style="text-align: center; padding: 1rem;">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: #1e293b;">{{ service.title }}</h3>
+                                <p style="font-size: 0.85rem; color: #475569; line-height: 1.6; margin-bottom: 1rem;">{{ service.description }}</p>
+                                <button style="background: #1e293b; color: white; border: none; padding: 0.6rem 1.25rem; font-size: 0.8rem; font-weight: 600; cursor: pointer;">Read more</button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_output.cta_banner %}
+                    <div class="cta-banner-section" style="background: #1e293b; color: white; text-align: center; padding: 3rem 2rem;">
+                        <h2 style="font-size: 1.5rem; font-style: italic; margin-bottom: 1rem;">{{ parsed_output.cta_banner.headline }}</h2>
+                        <p style="font-size: 0.9rem; opacity: 0.9; max-width: 700px; margin: 0 auto 1.5rem;">{{ parsed_output.cta_banner.paragraph }}</p>
+                        <button style="background: transparent; border: 2px solid white; color: white; padding: 0.75rem 1.5rem; font-weight: 600; cursor: pointer;">{{ parsed_output.cta_banner.button_text }}</button>
+                    </div>
+                    {% endif %}
+
+                    <div class="footer-bar" style="background: #0f172a; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="color: #64748b; font-size: 0.8rem;">Privacy &nbsp; Disclaimer</div>
+                        <div style="color: #64748b; font-size: 0.8rem;">Powered By Webware.ai</div>
+                    </div>
+                </div>
+
                 {% elif parsed_output and page_type == 'service_area' %}
                 <!-- SERVICE AREA PAGE PREVIEW -->
                 <div class="website-preview">
@@ -592,7 +643,36 @@ E-E-A-T Requirements
 
 Show experience, expertise, and understanding, such as:
 
-Professional process explanation, safety or quality considerations, realistic local use cases, customer scenarios, common local issues related to the service`
+Professional process explanation, safety or quality considerations, realistic local use cases, customer scenarios, common local issues related to the service`,
+
+            services_overview: `SYSTEM PROMPT - Services Overview Page Builder
+
+Role:
+You are an expert SEO website copywriter specialising in services overview pages.
+Your job is to generate a comprehensive services landing page that showcases multiple service offerings.
+
+RULES (MUST FOLLOW ALL):
+Language & Style
+
+British English only.
+
+Standard ASCII only (no curly quotes, emojis, special characters).
+
+Professional, informative, trustworthy tone.
+
+Mention the business name no more than once.
+
+Do NOT include: phone numbers, emails, URLs, pricing, awards, unverifiable claims.
+
+SEO & Content Requirements
+
+Use the provided ICP and UVP to inform the content.
+
+Naturally integrate the location into headlines and content.
+
+Each service description should be unique and compelling.
+
+Focus on benefits and value to the customer.`
         };
 
         const PRESETS_JSON = {
@@ -742,6 +822,32 @@ OUTPUT FORMAT (JSON):
     "paragraph": "2-3 sentences about staying informed or getting updates.",
     "button_text": "CTA button text (e.g., Subscribe Now)"
   }
+}`,
+
+            services_overview: `
+
+OUTPUT FORMAT (JSON):
+
+{
+  "hero_section": {
+    "h1": "[Service Category] Services in [City], Delivered with Skill and Transparency",
+    "intro_paragraph": "3-4 sentences describing what services the business provides, the location served, and the key value proposition."
+  },
+  "services_section": {
+    "headline": "Our [Service Category] Services in [City]",
+    "services": [
+      {"title": "Service 1 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."},
+      {"title": "Service 2 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."},
+      {"title": "Service 3 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."},
+      {"title": "Service 4 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."},
+      {"title": "Service 5 Name", "description": "4-6 sentences describing this service, what it includes, the process, and benefits to customers."}
+    ]
+  },
+  "cta_banner": {
+    "headline": "Ready to [action verb] your [benefit/outcome] with expertise?",
+    "paragraph": "2-3 sentences about staying informed, getting updates on services, or encouraging consultation.",
+    "button_text": "Request a private consultation"
+  }
 }`
         };
 
@@ -764,7 +870,7 @@ OUTPUT FORMAT (JSON):
             const cityField = document.getElementById('city-field');
             const serviceField = document.getElementById('service-field');
             
-            cityField.style.display = pageType === 'service_area' ? 'block' : 'none';
+            cityField.style.display = (pageType === 'service_area' || pageType === 'services_overview') ? 'block' : 'none';
             serviceField.style.display = pageType === 'service_page' ? 'block' : 'none';
         }
 
@@ -783,6 +889,8 @@ OUTPUT FORMAT (JSON):
                 exportText = formatServicePageExport();
             } else if (pageType === 'service_area') {
                 exportText = formatServiceAreaExport();
+            } else if (pageType === 'services_overview') {
+                exportText = formatServicesOverviewExport();
             }
             
             if (exportText) {
@@ -911,6 +1019,48 @@ OUTPUT FORMAT (JSON):
                 const h2 = finalCta.querySelector('h2');
                 const p = finalCta.querySelector('p');
                 const btn = finalCta.querySelector('button');
+                if (h2) text += 'Headline: ' + h2.textContent.trim() + '\n';
+                if (p) text += 'Paragraph: ' + p.textContent.trim() + '\n';
+                if (btn) text += 'Button Text: ' + btn.textContent.trim() + '\n';
+            }
+            
+            return text;
+        }
+
+        function formatServicesOverviewExport() {
+            let text = '=== SERVICES OVERVIEW PAGE CONTENT EXPORT ===\n\n';
+            
+            const heroH1 = document.querySelector('.website-preview .hero-section h1');
+            const heroPara = document.querySelector('.website-preview .hero-section p');
+            if (heroH1) {
+                text += '--- TOP BANNER (Hero Section) ---\n';
+                text += 'H1: ' + heroH1.textContent.trim() + '\n';
+                if (heroPara) text += 'Intro Paragraph: ' + heroPara.textContent.trim() + '\n';
+                text += '\n';
+            }
+            
+            const servicesHeadline = document.querySelector('.services-overview-section h2');
+            if (servicesHeadline) {
+                text += '--- SERVICES SECTION ---\n';
+                text += 'Headline: ' + servicesHeadline.textContent.trim() + '\n\n';
+            }
+            
+            const serviceCards = document.querySelectorAll('.service-overview-card');
+            serviceCards.forEach((card, i) => {
+                const title = card.querySelector('h3');
+                const desc = card.querySelector('p');
+                text += '--- SERVICE #' + (i + 1) + ' ---\n';
+                if (title) text += 'Title: ' + title.textContent.trim() + '\n';
+                if (desc) text += 'Description: ' + desc.textContent.trim() + '\n';
+                text += '\n';
+            });
+            
+            const ctaBanner = document.querySelector('.cta-banner-section');
+            if (ctaBanner) {
+                text += '--- CTA BANNER ---\n';
+                const h2 = ctaBanner.querySelector('h2');
+                const p = ctaBanner.querySelector('p');
+                const btn = ctaBanner.querySelector('button');
                 if (h2) text += 'Headline: ' + h2.textContent.trim() + '\n';
                 if (p) text += 'Paragraph: ' + p.textContent.trim() + '\n';
                 if (btn) text += 'Button Text: ' + btn.textContent.trim() + '\n';
