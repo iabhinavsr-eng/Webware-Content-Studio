@@ -241,34 +241,40 @@ OUTPUT FORMAT (JSON):
 
 {
   "hero_section": {
-    "h1": "Location-specific headline",
-    "intro": "2-3 sentences about the service in this specific location.",
-    "cta": "Short CTA sentence"
+    "h1": "Location-specific headline including business name and location",
+    "intro_paragraph": "3-4 sentences about the service in this specific location and how it helps local customers."
   },
-  "local_context_section": {
-    "headline": "Why [Location] Properties Need This Service",
-    "paragraphs": ["Paragraph about local conditions", "Paragraph about common local issues"]
+  "overview_section": {
+    "headline": "Compelling headline about the service in this location",
+    "paragraph": "4-5 sentences about how the service helps local customers, what they can expect, and the value provided.",
+    "cta_link_text": "Short CTA text (e.g., Contact us to begin)"
   },
-  "service_overview_section": {
-    "paragraphs": ["What the service includes for this area", "Who benefits from it locally"]
+  "main_content_section": {
+    "headline": "Headline about the approach or methodology",
+    "paragraph": "5-6 sentences explaining the detailed approach, what makes the service valuable, and how it addresses local customer needs."
   },
-  "key_benefits_section": [
-    "Location-specific benefit 1",
-    "Location-specific benefit 2",
-    "Location-specific benefit 3"
+  "services_list_section": [
+    {"title": "Service 1 Name", "description": "2-3 sentences describing this specific service and its benefits."},
+    {"title": "Service 2 Name", "description": "2-3 sentences describing this specific service and its benefits."},
+    {"title": "Service 3 Name", "description": "2-3 sentences describing this specific service and its benefits."}
   ],
-  "process_section": [
-    {"title": "Step 1", "description": "Explanation"},
-    {"title": "Step 2", "description": "Explanation"},
-    {"title": "Step 3", "description": "Explanation"}
-  ],
-  "faq_section": [
-    {"question": "Location-relevant FAQ 1", "answer": "2-3 sentence answer"},
-    {"question": "Location-relevant FAQ 2", "answer": "2-3 sentence answer"},
-    {"question": "Location-relevant FAQ 3", "answer": "2-3 sentence answer"}
-  ],
-  "final_cta_section": {
-    "paragraph": "2-3 sentences encouraging local customers to take action."
+  "benefits_section": {
+    "headline": "Headline about support or expertise",
+    "paragraph": "2-3 sentences introducing the benefits.",
+    "bullets": [
+      "Benefit bullet 1",
+      "Benefit bullet 2",
+      "Benefit bullet 3",
+      "Benefit bullet 4",
+      "Benefit bullet 5",
+      "Benefit bullet 6",
+      "Benefit bullet 7"
+    ]
+  },
+  "newsletter_cta_section": {
+    "headline": "Headline encouraging subscription or ongoing engagement",
+    "paragraph": "2-3 sentences about staying informed or getting updates.",
+    "button_text": "CTA button text (e.g., Subscribe Now)"
   }
 }"""
 

@@ -78,26 +78,35 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             z-index: 1000;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
         .loading-overlay.visible { display: flex; }
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid #e2e8f0;
-            border-top-color: #1e293b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .progress-container {
+            width: 300px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 24px;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1e293b, #475569);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 8px;
+        }
+        .progress-text {
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            color: #1e293b;
+            font-weight: 600;
         }
         .loading-text {
-            margin-top: 1rem;
+            margin-top: 0.5rem;
             font-size: 1rem;
             color: #475569;
             font-weight: 500;
@@ -118,7 +127,10 @@
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
         <div class="loading-text">Generating content...</div>
         <div class="loading-subtext">This may take 10-20 seconds</div>
     </div>
@@ -167,6 +179,21 @@
                     document.getElementById('loadingOverlay').classList.add('visible');
                     document.getElementById('submitBtn').disabled = true;
                     document.getElementById('submitBtn').textContent = 'Generating...';
+                    
+                    let progress = 0;
+                    const progressBar = document.getElementById('progressBar');
+                    const progressText = document.getElementById('progressText');
+                    
+                    const interval = setInterval(function() {
+                        if (progress < 95) {
+                            progress += Math.random() * 3 + 1;
+                            if (progress > 95) progress = 95;
+                            progressBar.style.width = progress + '%';
+                            progressText.textContent = Math.round(progress) + '%';
+                        }
+                    }, 400);
+                    
+                    window.progressInterval = interval;
                 });
             </script>
         </div>
@@ -340,80 +367,64 @@
                 <div class="website-preview">
                     <div class="hero-section">
                         <h1>{{ parsed_output.hero_section.h1 if parsed_output.hero_section else 'Location Page' }}</h1>
-                        <p>{{ parsed_output.hero_section.intro if parsed_output.hero_section else '' }}</p>
-                        {% if parsed_output.hero_section and parsed_output.hero_section.cta %}
-                        <p style="margin-top: 1rem; font-weight: 600;">{{ parsed_output.hero_section.cta }}</p>
-                        {% endif %}
+                        <p>{{ parsed_output.hero_section.intro_paragraph if parsed_output.hero_section else (parsed_output.hero_section.intro if parsed_output.hero_section else '') }}</p>
                     </div>
 
-                    {% if parsed_output.local_context_section %}
-                    <div class="section-block" style="background-color: #faf8f5;">
-                        <h2>{{ parsed_output.local_context_section.headline }}</h2>
-                        {% if parsed_output.local_context_section.paragraphs %}
-                        {% for para in parsed_output.local_context_section.paragraphs %}
-                        <p>{{ para }}</p>
-                        {% endfor %}
+                    {% if parsed_output.overview_section %}
+                    <div class="section-block" style="text-align: center; padding: 2.5rem;">
+                        <h2 style="font-size: 1.5rem; font-style: italic; margin-bottom: 1rem;">{{ parsed_output.overview_section.headline }}</h2>
+                        <p style="max-width: 800px; margin: 0 auto 1.5rem;">{{ parsed_output.overview_section.paragraph }}</p>
+                        {% if parsed_output.overview_section.cta_link_text %}
+                        <a href="#" style="color: #475569; text-decoration: underline; font-weight: 500;">{{ parsed_output.overview_section.cta_link_text }}</a>
                         {% endif %}
                     </div>
                     {% endif %}
 
-                    {% if parsed_output.service_overview_section %}
-                    <div class="section-block">
-                        <h2>Service Overview</h2>
-                        {% if parsed_output.service_overview_section.paragraphs %}
-                        {% for para in parsed_output.service_overview_section.paragraphs %}
-                        <p>{{ para }}</p>
-                        {% endfor %}
-                        {% else %}
-                        <p>{{ parsed_output.service_overview_section }}</p>
-                        {% endif %}
+                    {% if parsed_output.main_content_section %}
+                    <div class="section-block" style="padding: 2rem;">
+                        <h2 style="font-size: 1.5rem; font-style: italic; text-align: center; margin-bottom: 1rem;">{{ parsed_output.main_content_section.headline }}</h2>
+                        <p style="text-align: center; max-width: 900px; margin: 0 auto;">{{ parsed_output.main_content_section.paragraph }}</p>
                     </div>
                     {% endif %}
 
-                    {% if parsed_output.key_benefits_section %}
-                    <div class="section-block" style="background-color: #f8fafc;">
-                        <h2>Key Benefits</h2>
-                        <ul>
-                        {% if parsed_output.key_benefits_section is iterable and parsed_output.key_benefits_section is not string %}
-                        {% for benefit in parsed_output.key_benefits_section %}
-                        <li>{{ benefit }}</li>
-                        {% endfor %}
-                        {% endif %}
+                    {% if parsed_output.services_list_section %}
+                    <div class="section-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem; align-items: start;">
+                        <div style="background: #e2e8f0; height: 250px; display: flex; align-items: center; justify-content: center; color: #64748b;">Image Placeholder</div>
+                        <div>
+                            {% for service in parsed_output.services_list_section %}
+                            <div style="margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+                                <span style="color: #6b7280; font-size: 1.25rem;">●</span>
+                                <div>
+                                    <strong>{{ service.title }}</strong> {{ service.description }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <button style="margin-top: 1rem; background: #6b7280; color: white; border: none; padding: 0.75rem 1.5rem; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">View Services</button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_output.benefits_section %}
+                    <div class="section-block" style="background-color: #faf8f5; padding: 2rem;">
+                        <h2 style="font-size: 1.5rem; font-style: italic; margin-bottom: 1rem;">{{ parsed_output.benefits_section.headline }}</h2>
+                        <p style="margin-bottom: 1rem;">{{ parsed_output.benefits_section.paragraph }}</p>
+                        {% if parsed_output.benefits_section.bullets %}
+                        <ul style="list-style: none; padding: 0;">
+                            {% for bullet in parsed_output.benefits_section.bullets %}
+                            <li style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: #6b7280;">●</span> {{ bullet }}
+                            </li>
+                            {% endfor %}
                         </ul>
-                    </div>
-                    {% endif %}
-
-                    {% if parsed_output.process_section %}
-                    <div class="section-block">
-                        <h2>How It Works</h2>
-                        {% if parsed_output.process_section is iterable and parsed_output.process_section is not string %}
-                        {% for step in parsed_output.process_section %}
-                        <div class="step-item">
-                            <h4>{{ step.title if step.title else 'Step ' ~ loop.index }}</h4>
-                            <p>{{ step.description if step.description else step }}</p>
-                        </div>
-                        {% endfor %}
                         {% endif %}
                     </div>
                     {% endif %}
 
-                    {% if parsed_output.faq_section %}
-                    <div class="section-block" style="background-color: #faf8f5;">
-                        <h2>Frequently Asked Questions</h2>
-                        {% if parsed_output.faq_section is iterable and parsed_output.faq_section is not string %}
-                        {% for faq in parsed_output.faq_section %}
-                        <div class="faq-item">
-                            <h4>{{ faq.question if faq.question else faq }}</h4>
-                            <p>{{ faq.answer if faq.answer else '' }}</p>
-                        </div>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-                    {% endif %}
-
-                    {% if parsed_output.final_cta_section %}
-                    <div class="final-cta">
-                        <p>{{ parsed_output.final_cta_section if parsed_output.final_cta_section is string else parsed_output.final_cta_section.paragraph }}</p>
+                    {% if parsed_output.newsletter_cta_section %}
+                    <div class="final-cta" style="background: linear-gradient(135deg, #6b7280, #4b5563); text-align: center;">
+                        <h2 style="font-size: 1.5rem; font-style: italic; margin-bottom: 1rem;">{{ parsed_output.newsletter_cta_section.headline }}</h2>
+                        <p style="margin-bottom: 1.5rem; max-width: 700px; margin-left: auto; margin-right: auto;">{{ parsed_output.newsletter_cta_section.paragraph }}</p>
+                        <button style="background: #4b5563; color: white; border: none; padding: 0.75rem 1.5rem; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">{{ parsed_output.newsletter_cta_section.button_text }}</button>
                     </div>
                     {% endif %}
 
@@ -678,34 +689,40 @@ OUTPUT FORMAT (JSON):
 
 {
   "hero_section": {
-    "h1": "Location-specific headline",
-    "intro": "2-3 sentences about the service in this specific location.",
-    "cta": "Short CTA sentence"
+    "h1": "Location-specific headline including business name and location",
+    "intro_paragraph": "3-4 sentences about the service in this specific location and how it helps local customers."
   },
-  "local_context_section": {
-    "headline": "Why [Location] Properties Need This Service",
-    "paragraphs": ["Paragraph about local conditions", "Paragraph about common local issues"]
+  "overview_section": {
+    "headline": "Compelling headline about the service in this location",
+    "paragraph": "4-5 sentences about how the service helps local customers, what they can expect, and the value provided.",
+    "cta_link_text": "Short CTA text (e.g., Contact us to begin)"
   },
-  "service_overview_section": {
-    "paragraphs": ["What the service includes for this area", "Who benefits from it locally"]
+  "main_content_section": {
+    "headline": "Headline about the approach or methodology",
+    "paragraph": "5-6 sentences explaining the detailed approach, what makes the service valuable, and how it addresses local customer needs."
   },
-  "key_benefits_section": [
-    "Location-specific benefit 1",
-    "Location-specific benefit 2",
-    "Location-specific benefit 3"
+  "services_list_section": [
+    {"title": "Service 1 Name", "description": "2-3 sentences describing this specific service and its benefits."},
+    {"title": "Service 2 Name", "description": "2-3 sentences describing this specific service and its benefits."},
+    {"title": "Service 3 Name", "description": "2-3 sentences describing this specific service and its benefits."}
   ],
-  "process_section": [
-    {"title": "Step 1", "description": "Explanation"},
-    {"title": "Step 2", "description": "Explanation"},
-    {"title": "Step 3", "description": "Explanation"}
-  ],
-  "faq_section": [
-    {"question": "Location-relevant FAQ 1", "answer": "2-3 sentence answer"},
-    {"question": "Location-relevant FAQ 2", "answer": "2-3 sentence answer"},
-    {"question": "Location-relevant FAQ 3", "answer": "2-3 sentence answer"}
-  ],
-  "final_cta_section": {
-    "paragraph": "2-3 sentences encouraging local customers to take action."
+  "benefits_section": {
+    "headline": "Headline about support or expertise",
+    "paragraph": "2-3 sentences introducing the benefits.",
+    "bullets": [
+      "Benefit bullet 1",
+      "Benefit bullet 2",
+      "Benefit bullet 3",
+      "Benefit bullet 4",
+      "Benefit bullet 5",
+      "Benefit bullet 6",
+      "Benefit bullet 7"
+    ]
+  },
+  "newsletter_cta_section": {
+    "headline": "Headline encouraging subscription or ongoing engagement",
+    "paragraph": "2-3 sentences about staying informed or getting updates.",
+    "button_text": "CTA button text (e.g., Subscribe Now)"
   }
 }`
         };
