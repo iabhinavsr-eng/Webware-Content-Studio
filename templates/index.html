@@ -250,84 +250,85 @@
                 <div class="website-preview">
                     <div class="hero-section">
                         <h1>{{ parsed_output.hero_section.h1 if parsed_output.hero_section else 'Service Page' }}</h1>
-                        <p>{{ parsed_output.hero_section.intro if parsed_output.hero_section else '' }}</p>
-                        {% if parsed_output.hero_section and parsed_output.hero_section.cta %}
-                        <p style="margin-top: 1rem; font-weight: 600;">{{ parsed_output.hero_section.cta }}</p>
-                        {% endif %}
+                        <p>{{ parsed_output.hero_section.intro_paragraph if parsed_output.hero_section else (parsed_output.hero_section.intro if parsed_output.hero_section else '') }}</p>
                     </div>
 
                     {% if parsed_output.service_overview_section %}
                     <div class="section-block">
-                        <h2>Service Overview</h2>
-                        {% if parsed_output.service_overview_section is string %}
-                        <p>{{ parsed_output.service_overview_section }}</p>
-                        {% elif parsed_output.service_overview_section.paragraphs %}
-                        {% for para in parsed_output.service_overview_section.paragraphs %}
-                        <p>{{ para }}</p>
+                        <p>{{ parsed_output.service_overview_section.paragraph_1 if parsed_output.service_overview_section.paragraph_1 else '' }}</p>
+                        <p style="margin-top: 1rem;">{{ parsed_output.service_overview_section.paragraph_2 if parsed_output.service_overview_section.paragraph_2 else '' }}</p>
+                        {% if parsed_output.service_overview_section.cta_button_text %}
+                        <button class="cta-button" style="margin-top: 1.5rem; background: #1e293b; color: white; border: none; padding: 0.75rem 1.5rem; font-weight: 600; cursor: pointer;">{{ parsed_output.service_overview_section.cta_button_text }}</button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_output.benefits_section %}
+                    <div class="value-prop" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; padding: 2rem 0;">
+                        {% for benefit in parsed_output.benefits_section %}
+                        <div class="benefit-card" style="background: #1e293b; color: white; padding: 1.5rem;">
+                            <h4 style="font-size: 1rem; font-style: italic; margin-bottom: 0.75rem; color: white;">{{ benefit.headline }}</h4>
+                            <p style="font-size: 0.85rem; color: #e2e8f0; line-height: 1.6;">{{ benefit.description }}</p>
+                        </div>
                         {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_output.service_details %}
+                    {% for detail in parsed_output.service_details %}
+                    <div class="section-block service-detail-block" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; padding: 2rem 0; {% if loop.index is odd %}{% else %}background-color: #1e293b; color: white; padding: 2rem;{% endif %}">
+                        {% if loop.index is odd %}
+                        <div class="detail-image" style="background: #e2e8f0; height: 250px; display: flex; align-items: center; justify-content: center; color: #64748b; border: 3px solid #1e293b;">Image Placeholder</div>
+                        <div class="detail-content">
+                            <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">{{ detail.title }}</h3>
+                            <p style="margin-bottom: 0.75rem;">{{ detail.paragraph_1 }}</p>
+                            <p style="margin-bottom: 1rem;">{{ detail.paragraph_2 }}</p>
+                            <ul style="list-style: disc; padding-left: 1.25rem;">
+                            {% for bullet in detail.bullets %}
+                                <li style="margin-bottom: 0.25rem;">{{ bullet }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
                         {% else %}
-                        <p>{{ parsed_output.service_overview_section }}</p>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-
-                    {% if parsed_output.key_benefits_section %}
-                    <div class="section-block" style="background-color: #faf8f5;">
-                        <h2>Key Benefits</h2>
-                        <ul>
-                        {% if parsed_output.key_benefits_section is iterable and parsed_output.key_benefits_section is not string %}
-                        {% for benefit in parsed_output.key_benefits_section %}
-                        <li>{{ benefit }}</li>
-                        {% endfor %}
-                        {% endif %}
-                        </ul>
-                    </div>
-                    {% endif %}
-
-                    {% if parsed_output.process_section %}
-                    <div class="section-block">
-                        <h2>How It Works</h2>
-                        {% if parsed_output.process_section is iterable and parsed_output.process_section is not string %}
-                        {% for step in parsed_output.process_section %}
-                        <div class="step-item">
-                            <h4>{{ step.title if step.title else 'Step ' ~ loop.index }}</h4>
-                            <p>{{ step.description if step.description else step }}</p>
+                        <div class="detail-content">
+                            <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: white;">{{ detail.title }}</h3>
+                            <p style="margin-bottom: 0.75rem; color: #e2e8f0;">{{ detail.paragraph_1 }}</p>
+                            <p style="margin-bottom: 1rem; color: #e2e8f0;">{{ detail.paragraph_2 }}</p>
+                            <ul style="list-style: disc; padding-left: 1.25rem; color: #e2e8f0;">
+                            {% for bullet in detail.bullets %}
+                                <li style="margin-bottom: 0.25rem;">{{ bullet }}</li>
+                            {% endfor %}
+                            </ul>
                         </div>
-                        {% endfor %}
+                        <div class="detail-image" style="background: #475569; height: 250px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">Image Placeholder</div>
                         {% endif %}
                     </div>
-                    {% endif %}
-
-                    {% if parsed_output.use_cases_section %}
-                    <div class="section-block" style="background-color: #f8fafc;">
-                        <h2>When You Need This Service</h2>
-                        {% if parsed_output.use_cases_section is iterable and parsed_output.use_cases_section is not string %}
-                        {% for case in parsed_output.use_cases_section %}
-                        <div class="use-case-item">
-                            <p style="margin-bottom: 0;">{{ case }}</p>
-                        </div>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
+                    {% endfor %}
                     {% endif %}
 
                     {% if parsed_output.faq_section %}
-                    <div class="section-block">
-                        <h2>Frequently Asked Questions</h2>
+                    <div class="section-block" style="background-color: #faf8f5; padding: 2rem;">
+                        <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem;">Frequently Asked Questions</h2>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
                         {% if parsed_output.faq_section is iterable and parsed_output.faq_section is not string %}
                         {% for faq in parsed_output.faq_section %}
-                        <div class="faq-item">
-                            <h4>{{ faq.question if faq.question else faq }}</h4>
-                            <p>{{ faq.answer if faq.answer else '' }}</p>
+                        <div class="faq-item" style="background: white; padding: 1.25rem; border-left: 3px solid #1e293b;">
+                            <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;">{{ faq.question if faq.question else faq }}</h4>
+                            <p style="font-size: 0.85rem; color: #64748b; line-height: 1.6;">{{ faq.answer if faq.answer else '' }}</p>
                         </div>
                         {% endfor %}
                         {% endif %}
+                        </div>
                     </div>
                     {% endif %}
 
                     {% if parsed_output.final_cta_section %}
                     <div class="final-cta">
-                        <p>{{ parsed_output.final_cta_section if parsed_output.final_cta_section is string else parsed_output.final_cta_section.paragraph }}</p>
+                        <h2 style="font-size: 1.5rem; font-style: italic; margin-bottom: 1rem;">{{ parsed_output.final_cta_section.headline if parsed_output.final_cta_section.headline else '' }}</h2>
+                        <p style="margin-bottom: 1.5rem;">{{ parsed_output.final_cta_section.paragraph if parsed_output.final_cta_section.paragraph else parsed_output.final_cta_section }}</p>
+                        {% if parsed_output.final_cta_section.button_text %}
+                        <button style="background: transparent; border: 2px solid white; color: white; padding: 0.75rem 1.5rem; font-weight: 600; cursor: pointer;">{{ parsed_output.final_cta_section.button_text }}</button>
+                        {% endif %}
                     </div>
                     {% endif %}
 
@@ -557,34 +558,61 @@ Your JSON output must include the following keys:
 {
   "hero_section": {
     "h1": "Main headline from page_structure",
-    "intro": "2-3 sentence intro summarising the service and its value.",
-    "cta": "Short CTA sentence (e.g., Get started today)"
+    "intro_paragraph": "4-6 sentence intro explaining the service, who it helps, and the value provided. This should be comprehensive."
   },
   "service_overview_section": {
-    "paragraphs": ["Paragraph 1", "Paragraph 2", "Paragraph 3"]
+    "paragraph_1": "3-4 sentences about the service approach and methodology.",
+    "paragraph_2": "3-4 sentences about professionalism, communication, and what to expect.",
+    "cta_button_text": "Short CTA text (e.g., Request a no-obligation quote now)"
   },
-  "key_benefits_section": [
-    "Benefit 1: 1-2 sentences",
-    "Benefit 2: 1-2 sentences",
-    "Benefit 3: 1-2 sentences"
+  "benefits_section": [
+    {"headline": "Short benefit headline (2-4 words)", "description": "2-3 sentences explaining this benefit."},
+    {"headline": "Short benefit headline (2-4 words)", "description": "2-3 sentences explaining this benefit."},
+    {"headline": "Short benefit headline (2-4 words)", "description": "2-3 sentences explaining this benefit."},
+    {"headline": "Short benefit headline (2-4 words)", "description": "2-3 sentences explaining this benefit."}
   ],
-  "process_section": [
-    {"title": "Step 1 title", "description": "1-2 sentence explanation"},
-    {"title": "Step 2 title", "description": "1-2 sentence explanation"},
-    {"title": "Step 3 title", "description": "1-2 sentence explanation"}
-  ],
-  "use_cases_section": [
-    "Use case 1: 1-2 sentences",
-    "Use case 2: 1-2 sentences",
-    "Use case 3: 1-2 sentences"
+  "service_details": [
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    },
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    },
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    },
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    },
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    }
   ],
   "faq_section": [
     {"question": "FAQ question 1", "answer": "2-3 sentence answer"},
     {"question": "FAQ question 2", "answer": "2-3 sentence answer"},
-    {"question": "FAQ question 3", "answer": "2-3 sentence answer"}
+    {"question": "FAQ question 3", "answer": "2-3 sentence answer"},
+    {"question": "FAQ question 4", "answer": "2-3 sentence answer"}
   ],
   "final_cta_section": {
-    "paragraph": "2-3 sentence closing encouraging the user to take the next step."
+    "headline": "Compelling headline encouraging action",
+    "paragraph": "2-3 sentence closing about getting started.",
+    "button_text": "CTA button text"
   }
 }`,
 

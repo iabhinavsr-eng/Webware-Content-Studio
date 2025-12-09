@@ -121,34 +121,61 @@ Your JSON output must include the following keys:
 {
   "hero_section": {
     "h1": "Main headline from page_structure",
-    "intro": "2-3 sentence intro summarising the service and its value.",
-    "cta": "Short CTA sentence (e.g., Get started today)"
+    "intro_paragraph": "4-6 sentence intro explaining the service, who it helps, and the value provided. This should be comprehensive."
   },
   "service_overview_section": {
-    "paragraphs": ["Paragraph 1", "Paragraph 2", "Paragraph 3"]
+    "paragraph_1": "3-4 sentences about the service approach and methodology.",
+    "paragraph_2": "3-4 sentences about professionalism, communication, and what to expect.",
+    "cta_button_text": "Short CTA text (e.g., Request a no-obligation quote now)"
   },
-  "key_benefits_section": [
-    "Benefit 1: 1-2 sentences",
-    "Benefit 2: 1-2 sentences",
-    "Benefit 3: 1-2 sentences"
+  "benefits_section": [
+    {"headline": "Short benefit headline (2-4 words)", "description": "2-3 sentences explaining this benefit."},
+    {"headline": "Short benefit headline (2-4 words)", "description": "2-3 sentences explaining this benefit."},
+    {"headline": "Short benefit headline (2-4 words)", "description": "2-3 sentences explaining this benefit."},
+    {"headline": "Short benefit headline (2-4 words)", "description": "2-3 sentences explaining this benefit."}
   ],
-  "process_section": [
-    {"title": "Step 1 title", "description": "1-2 sentence explanation"},
-    {"title": "Step 2 title", "description": "1-2 sentence explanation"},
-    {"title": "Step 3 title", "description": "1-2 sentence explanation"}
-  ],
-  "use_cases_section": [
-    "Use case 1: 1-2 sentences",
-    "Use case 2: 1-2 sentences",
-    "Use case 3: 1-2 sentences"
+  "service_details": [
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    },
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    },
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    },
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    },
+    {
+      "title": "Service detail title",
+      "paragraph_1": "2-3 sentences about this specific service aspect.",
+      "paragraph_2": "2-3 sentences with more details.",
+      "bullets": ["Bullet point 1", "Bullet point 2", "Bullet point 3", "Bullet point 4", "Bullet point 5"]
+    }
   ],
   "faq_section": [
     {"question": "FAQ question 1", "answer": "2-3 sentence answer"},
     {"question": "FAQ question 2", "answer": "2-3 sentence answer"},
-    {"question": "FAQ question 3", "answer": "2-3 sentence answer"}
+    {"question": "FAQ question 3", "answer": "2-3 sentence answer"},
+    {"question": "FAQ question 4", "answer": "2-3 sentence answer"}
   ],
   "final_cta_section": {
-    "paragraph": "2-3 sentence closing encouraging the user to take the next step."
+    "headline": "Compelling headline encouraging action",
+    "paragraph": "2-3 sentence closing about getting started.",
+    "button_text": "CTA button text"
   }
 }"""
 
