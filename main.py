@@ -318,6 +318,7 @@ def index():
     icp = ""
     uvp = ""
     city = ""
+    service_name = ""
     prompt_instructions = ""
     page_type = "homepage"
     model = "gpt-4.1-mini"
@@ -326,6 +327,7 @@ def index():
         icp = request.form.get("icp", "").strip()
         uvp = request.form.get("uvp", "").strip()
         city = request.form.get("city", "").strip()
+        service_name = request.form.get("service_name", "").strip()
         prompt_instructions = request.form.get("prompt_instructions", "").strip()
         page_type = request.form.get("page_type", "homepage").strip()
         model = request.form.get("model", "").strip() or "gpt-4.1-mini"
@@ -351,6 +353,22 @@ ICP:
 
 UVP:
 {uvp}"""
+            elif page_type == "service_page" and service_name:
+                user_message = f"""Here is the current data:
+
+TARGET SERVICE: {service_name}
+
+Important: Generate content specifically for the {service_name} service. Focus on:
+- What this specific service entails
+- Benefits specific to this service
+- Common customer questions about this service
+- Process and methodology for this service
+
+ICP:
+{icp}
+
+UVP:
+{uvp}"""
             else:
                 user_message = f"Here is the current data:\n\nICP:\n{icp}\n\nUVP:\n{uvp}"
             
@@ -359,7 +377,7 @@ UVP:
             # Try to parse as JSON for visual display
             try:
                 # Clean up potential markdown code blocks
-                clean_output = model_output.strip()
+                clean_output = (model_output or "").strip()
                 if clean_output.startswith("```json"):
                     clean_output = clean_output[7:]
                 if clean_output.startswith("```"):
@@ -385,6 +403,7 @@ UVP:
         icp=icp,
         uvp=uvp,
         city=city,
+        service_name=service_name,
         prompt_instructions=prompt_instructions,
         page_type=page_type,
         default_prompt=get_default_prompt(page_type),

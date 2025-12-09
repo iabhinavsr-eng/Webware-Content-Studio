@@ -151,7 +151,13 @@
                 <div class="form-group" id="city-field" style="display: none;">
                     <label for="city">Target City/Location</label>
                     <input type="text" name="city" id="city" placeholder="e.g., Montreal, QC or Longueuil" value="{{ city or '' }}" style="padding: 0.6rem; font-size: 0.85rem; border: 1px solid #d1d5db; border-radius: 0.375rem; width: 100%;">
-                    <small style="color: #64748b; font-size: 0.7rem; margin-top: 0.25rem; display: block;">Enter the city name for location-specific content. The AI will include local context like climate, common property issues, and regional considerations.</small>
+                    <small style="color: #64748b; font-size: 0.7rem; margin-top: 0.25rem; display: block;">Enter the city name for location-specific content.</small>
+                </div>
+
+                <div class="form-group" id="service-field" style="display: none;">
+                    <label for="service_name">Service Name</label>
+                    <input type="text" name="service_name" id="service_name" placeholder="e.g., Roof Cleaning, Gutter Maintenance, Pressure Washing" value="{{ service_name or '' }}" style="padding: 0.6rem; font-size: 0.85rem; border: 1px solid #d1d5db; border-radius: 0.375rem; width: 100%;">
+                    <small style="color: #64748b; font-size: 0.7rem; margin-top: 0.25rem; display: block;">Enter the specific service you want content for.</small>
                 </div>
 
                 <div class="form-group">
@@ -165,8 +171,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="prompt_instructions">System Prompt</label>
-                    <textarea name="prompt_instructions" id="prompt_instructions" class="prompt-input">{{ prompt_instructions if prompt_instructions else default_prompt }}</textarea>
+                    <label for="prompt_instructions">System Prompt <small style="font-weight: normal; color: #64748b;">(JSON structure is locked)</small></label>
+                    <textarea name="prompt_display" id="prompt_display" class="prompt-input" style="height: 180px;"></textarea>
+                    <input type="hidden" name="prompt_instructions" id="prompt_instructions" value="">
                 </div>
 
                 <input type="hidden" name="model" value="gpt-4.1-mini">
@@ -200,7 +207,12 @@
 
         <div class="preview-panel">
             <div class="preview-container">
-                <div class="preview-label">Preview</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div class="preview-label" style="margin-bottom: 0;">Preview</div>
+                    {% if parsed_output %}
+                    <button type="button" onclick="exportContent()" style="background: #1e293b; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; font-size: 0.8rem; cursor: pointer;">Export Content</button>
+                    {% endif %}
+                </div>
 
                 {% if error %}
                 <div class="error-box">{{ error }}</div>
@@ -457,7 +469,7 @@
     </div>
 
     <script>
-        const PRESETS = {
+        const PRESETS_PROSE = {
             homepage: `SYSTEM PROMPT (Homepage Content Builder)
 
 Role:
@@ -490,7 +502,101 @@ Do not include geographic references unless they appear in the service areas lis
 
 Naturally weave relevant keywords into the content without over-optimising.
 
-DO NOT include keywords as a list; integrate them in context.
+DO NOT include keywords as a list; integrate them in context.`,
+
+            service_page: `Role:
+You are an expert SEO website copywriter.
+Your job is to generate full service page content using the ICP, UVP, and SEO page structure provided.
+Your output must be strictly formatted JSON, use British English, and follow all constraints.
+
+RULES (MUST FOLLOW ALL):
+Language & Style
+
+British English only.
+
+Standard ASCII only (no curly quotes, emojis, special characters).
+
+Professional, informative, calm tone - no exaggerated claims.
+
+Do not repeat the business name more than once unless provided in the structure.
+
+Do not include: phone numbers, emails, URLs, pricing, owner names, awards, claims of superiority.
+
+No location mentions unless explicitly present in the service_areas input.
+
+SEO Constraints
+
+Use the provided H1 and naturally integrate relevant keywords.
+
+Do not keyword-stuff.
+
+Do not produce a list of keywords - integrate them into prose.
+
+Only use services/products explicitly provided.
+
+Do not invent new service offerings.`,
+
+            service_area: `SYSTEM PROMPT - Location Page Content Builder (2025 Google-Compliant)
+
+You are an expert SEO website copywriter specialising in local service pages.
+Your job is to generate high-quality, location-specific content that follows Google's 2025 Helpful Content, Local SEO, and E-E-A-T guidelines.
+
+Your output MUST be strict JSON, British English, standard ASCII, and follow ALL rules below.
+
+GLOBAL RULES (MUST FOLLOW ALL)
+Language & Writing Style
+
+British English only.
+
+Standard ASCII only (no curly quotes, emojis, special characters).
+
+Tone: professional, trustworthy, concise, clearly helpful.
+
+No hype (e.g., "best", "world-class", "#1").
+
+Mention the business name no more than once.
+
+Do NOT include:
+
+phone numbers, emails, URLs, pricing, awards or guarantees, unverifiable claims, owner names
+
+Google Helpful Content (2025) Requirements
+
+Your writing MUST:
+
+Be user-first, not keyword-first.
+
+Address real customer needs and problems specific to this location.
+
+Provide unique, non-duplicated insights - NO template repetition.
+
+Demonstrate local expertise:
+
+local conditions, common issues unique to the area, realistic examples, environmental, regulatory, or property-specific context
+
+Include helpful, educational information that informs users.
+
+Local SEO Rules (2025)
+
+Use the location name ONLY where natural, 1-3 times in the entire page.
+
+Do NOT city-stuff.
+
+Use real local context - NOT fluffy "we proudly serve the community" lines.
+
+Do NOT invent new neighbourhoods or service areas.
+
+NEVER list multiple cities inside paragraphs.
+
+E-E-A-T Requirements
+
+Show experience, expertise, and understanding, such as:
+
+Professional process explanation, safety or quality considerations, realistic local use cases, customer scenarios, common local issues related to the service`
+        };
+
+        const PRESETS_JSON = {
+            homepage: `
 
 Homepage Structure (MUST output all sections):
 
@@ -529,38 +635,7 @@ Your output must be valid JSON with these exact keys:
     "button_text": "CTA button text"
   }
 }`,
-
-            service_page: `Role:
-You are an expert SEO website copywriter.
-Your job is to generate full service page content using the ICP, UVP, and SEO page structure provided.
-Your output must be strictly formatted JSON, use British English, and follow all constraints.
-
-RULES (MUST FOLLOW ALL):
-Language & Style
-
-British English only.
-
-Standard ASCII only (no curly quotes, emojis, special characters).
-
-Professional, informative, calm tone - no exaggerated claims.
-
-Do not repeat the business name more than once unless provided in the structure.
-
-Do not include: phone numbers, emails, URLs, pricing, owner names, awards, claims of superiority.
-
-No location mentions unless explicitly present in the service_areas input.
-
-SEO Constraints
-
-Use the provided H1 and naturally integrate relevant keywords.
-
-Do not keyword-stuff.
-
-Do not produce a list of keywords - integrate them into prose.
-
-Only use services/products explicitly provided.
-
-Do not invent new service offerings.
+            service_page: `
 
 Structural Requirements (MUST output ALL sections):
 
@@ -626,64 +701,7 @@ Your JSON output must include the following keys:
     "button_text": "CTA button text"
   }
 }`,
-
-            service_area: `SYSTEM PROMPT - Location Page Content Builder (2025 Google-Compliant)
-
-You are an expert SEO website copywriter specialising in local service pages.
-Your job is to generate high-quality, location-specific content that follows Google's 2025 Helpful Content, Local SEO, and E-E-A-T guidelines.
-
-Your output MUST be strict JSON, British English, standard ASCII, and follow ALL rules below.
-
-GLOBAL RULES (MUST FOLLOW ALL)
-Language & Writing Style
-
-British English only.
-
-Standard ASCII only (no curly quotes, emojis, special characters).
-
-Tone: professional, trustworthy, concise, clearly helpful.
-
-No hype (e.g., "best", "world-class", "#1").
-
-Mention the business name no more than once.
-
-Do NOT include:
-
-phone numbers, emails, URLs, pricing, awards or guarantees, unverifiable claims, owner names
-
-Google Helpful Content (2025) Requirements
-
-Your writing MUST:
-
-Be user-first, not keyword-first.
-
-Address real customer needs and problems specific to this location.
-
-Provide unique, non-duplicated insights - NO template repetition.
-
-Demonstrate local expertise:
-
-local conditions, common issues unique to the area, realistic examples, environmental, regulatory, or property-specific context
-
-Include helpful, educational information that informs users.
-
-Local SEO Rules (2025)
-
-Use the location name ONLY where natural, 1-3 times in the entire page.
-
-Do NOT city-stuff.
-
-Use real local context - NOT fluffy "we proudly serve the community" lines.
-
-Do NOT invent new neighbourhoods or service areas.
-
-NEVER list multiple cities inside paragraphs.
-
-E-E-A-T Requirements
-
-Show experience, expertise, and understanding, such as:
-
-Professional process explanation, safety or quality considerations, realistic local use cases, customer scenarios, common local issues related to the service
+            service_area: `
 
 OUTPUT FORMAT (JSON):
 
@@ -728,25 +746,26 @@ OUTPUT FORMAT (JSON):
         };
 
         function loadPreset(name) {
-            const prompt = PRESETS[name];
-            if (prompt) {
-                document.getElementById('prompt_instructions').value = prompt;
+            const prose = PRESETS_PROSE[name];
+            const json = PRESETS_JSON[name];
+            if (prose) {
+                document.getElementById('prompt_display').value = prose;
+                document.getElementById('prompt_instructions').value = prose + json;
                 document.getElementById('page_type').value = name;
                 
                 document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
                 event.target.classList.add('active');
                 
-                updateCityFieldVisibility(name);
+                updateFieldVisibility(name);
             }
         }
 
-        function updateCityFieldVisibility(pageType) {
+        function updateFieldVisibility(pageType) {
             const cityField = document.getElementById('city-field');
-            if (pageType === 'service_area') {
-                cityField.style.display = 'block';
-            } else {
-                cityField.style.display = 'none';
-            }
+            const serviceField = document.getElementById('service-field');
+            
+            cityField.style.display = pageType === 'service_area' ? 'block' : 'none';
+            serviceField.style.display = pageType === 'service_page' ? 'block' : 'none';
         }
 
         function toggleRawJson() {
@@ -754,7 +773,232 @@ OUTPUT FORMAT (JSON):
             el.classList.toggle('visible');
         }
 
-        // Set active button and city field visibility on page load
+        function exportContent() {
+            const pageType = document.getElementById('page_type').value || 'homepage';
+            let exportText = '';
+            
+            if (pageType === 'homepage') {
+                exportText = formatHomepageExport();
+            } else if (pageType === 'service_page') {
+                exportText = formatServicePageExport();
+            } else if (pageType === 'service_area') {
+                exportText = formatServiceAreaExport();
+            }
+            
+            if (exportText) {
+                downloadTextFile(exportText, pageType + '_content.txt');
+            }
+        }
+
+        function formatHomepageExport() {
+            let text = '=== HOMEPAGE CONTENT EXPORT ===\n\n';
+            
+            const heroH1 = document.querySelector('.website-preview .hero-section h1');
+            const heroPara = document.querySelector('.website-preview .hero-section p');
+            if (heroH1) {
+                text += '--- TOP BANNER (Hero Section) ---\n';
+                text += 'H1: ' + heroH1.textContent.trim() + '\n';
+                if (heroPara) text += 'Paragraph: ' + heroPara.textContent.trim() + '\n';
+                text += '\n';
+            }
+            
+            const blogSection = document.querySelector('.blog-section');
+            if (blogSection) {
+                text += '--- BLOG/GUIDE SECTION ---\n';
+                const h2 = blogSection.querySelector('h2');
+                const p = blogSection.querySelector('p');
+                if (h2) text += 'Headline: ' + h2.textContent.trim() + '\n';
+                if (p) text += 'Paragraph: ' + p.textContent.trim() + '\n';
+                text += '\n';
+            }
+            
+            const valueProps = document.querySelectorAll('.value-prop');
+            valueProps.forEach((vp, i) => {
+                text += '--- VALUE PROPOSITION #' + (i + 1) + ' ---\n';
+                const h3 = vp.querySelector('h3');
+                const para = vp.querySelector('.value-prop-content > p:not(.testimonial)');
+                const testimonial = vp.querySelector('.testimonial');
+                const name = vp.querySelector('.testimonial-name');
+                if (h3) text += 'Headline: ' + h3.textContent.trim() + '\n';
+                if (para) text += 'Paragraph: ' + para.textContent.trim() + '\n';
+                if (testimonial) text += 'Testimonial: ' + testimonial.textContent.trim() + '\n';
+                if (name) text += 'Testimonial Name: ' + name.textContent.trim() + '\n';
+                text += '\n';
+            });
+            
+            const finalCta = document.querySelector('.final-cta');
+            if (finalCta) {
+                text += '--- FINAL CTA SECTION ---\n';
+                const h2 = finalCta.querySelector('h2');
+                const p = finalCta.querySelector('p');
+                const btn = finalCta.querySelector('button');
+                if (h2) text += 'Headline: ' + h2.textContent.trim() + '\n';
+                if (p) text += 'Paragraph: ' + p.textContent.trim() + '\n';
+                if (btn) text += 'Button Text: ' + btn.textContent.trim() + '\n';
+            }
+            
+            return text;
+        }
+
+        function formatServicePageExport() {
+            let text = '=== SERVICE PAGE CONTENT EXPORT ===\n\n';
+            
+            const heroH1 = document.querySelector('.website-preview .hero-section h1');
+            const heroPara = document.querySelector('.website-preview .hero-section p');
+            if (heroH1) {
+                text += '--- TOP BANNER (Hero Section) ---\n';
+                text += 'H1: ' + heroH1.textContent.trim() + '\n';
+                if (heroPara) text += 'Intro Paragraph: ' + heroPara.textContent.trim() + '\n';
+                text += '\n';
+            }
+            
+            const overviewSection = document.querySelectorAll('.section-block')[0];
+            if (overviewSection) {
+                text += '--- SERVICE OVERVIEW ---\n';
+                const paras = overviewSection.querySelectorAll('p');
+                paras.forEach((p, i) => {
+                    text += 'Paragraph ' + (i + 1) + ': ' + p.textContent.trim() + '\n';
+                });
+                const btn = overviewSection.querySelector('button');
+                if (btn) text += 'CTA Button: ' + btn.textContent.trim() + '\n';
+                text += '\n';
+            }
+            
+            const benefitCards = document.querySelectorAll('.benefit-card');
+            if (benefitCards.length > 0) {
+                text += '--- BENEFIT CARDS (4 Grids) ---\n';
+                benefitCards.forEach((card, i) => {
+                    const h4 = card.querySelector('h4');
+                    const p = card.querySelector('p');
+                    text += 'Benefit #' + (i + 1) + ' Headline: ' + (h4 ? h4.textContent.trim() : '') + '\n';
+                    text += 'Benefit #' + (i + 1) + ' Description: ' + (p ? p.textContent.trim() : '') + '\n';
+                });
+                text += '\n';
+            }
+            
+            const serviceDetails = document.querySelectorAll('.service-detail-block');
+            serviceDetails.forEach((block, i) => {
+                text += '--- SERVICE DETAIL BLOCK #' + (i + 1) + ' ---\n';
+                const h3 = block.querySelector('h3');
+                const paras = block.querySelectorAll('p');
+                const bullets = block.querySelectorAll('li');
+                if (h3) text += 'Title: ' + h3.textContent.trim() + '\n';
+                paras.forEach((p, j) => {
+                    text += 'Paragraph ' + (j + 1) + ': ' + p.textContent.trim() + '\n';
+                });
+                if (bullets.length > 0) {
+                    text += 'Bullets:\n';
+                    bullets.forEach(li => text += '  - ' + li.textContent.trim() + '\n');
+                }
+                text += '\n';
+            });
+            
+            const faqItems = document.querySelectorAll('.faq-item');
+            if (faqItems.length > 0) {
+                text += '--- FAQ SECTION ---\n';
+                faqItems.forEach((faq, i) => {
+                    const q = faq.querySelector('h4');
+                    const a = faq.querySelector('p');
+                    text += 'FAQ #' + (i + 1) + ' Question: ' + (q ? q.textContent.trim() : '') + '\n';
+                    text += 'FAQ #' + (i + 1) + ' Answer: ' + (a ? a.textContent.trim() : '') + '\n';
+                });
+                text += '\n';
+            }
+            
+            const finalCta = document.querySelector('.final-cta');
+            if (finalCta) {
+                text += '--- FINAL CTA SECTION ---\n';
+                const h2 = finalCta.querySelector('h2');
+                const p = finalCta.querySelector('p');
+                const btn = finalCta.querySelector('button');
+                if (h2) text += 'Headline: ' + h2.textContent.trim() + '\n';
+                if (p) text += 'Paragraph: ' + p.textContent.trim() + '\n';
+                if (btn) text += 'Button Text: ' + btn.textContent.trim() + '\n';
+            }
+            
+            return text;
+        }
+
+        function formatServiceAreaExport() {
+            let text = '=== SERVICE AREA PAGE CONTENT EXPORT ===\n\n';
+            
+            const heroH1 = document.querySelector('.website-preview .hero-section h1');
+            const heroPara = document.querySelector('.website-preview .hero-section p');
+            if (heroH1) {
+                text += '--- TOP BANNER (Hero Section) ---\n';
+                text += 'H1: ' + heroH1.textContent.trim() + '\n';
+                if (heroPara) text += 'Intro Paragraph: ' + heroPara.textContent.trim() + '\n';
+                text += '\n';
+            }
+            
+            const sections = document.querySelectorAll('.section-block');
+            let sectionIndex = 0;
+            
+            sections.forEach(section => {
+                const h2 = section.querySelector('h2');
+                const headline = h2 ? h2.textContent.trim() : '';
+                const paras = section.querySelectorAll('p');
+                const bullets = section.querySelectorAll('li');
+                
+                if (section.querySelector('a[href="#"]')) {
+                    text += '--- OVERVIEW SECTION ---\n';
+                } else if (section.querySelectorAll('strong').length > 0) {
+                    text += '--- SERVICES LIST SECTION ---\n';
+                } else if (bullets.length > 0) {
+                    text += '--- BENEFITS SECTION ---\n';
+                } else {
+                    text += '--- CONTENT SECTION ---\n';
+                }
+                
+                if (headline) text += 'Headline: ' + headline + '\n';
+                paras.forEach((p, i) => {
+                    const content = p.textContent.trim();
+                    if (content && !section.querySelector('strong')) {
+                        text += 'Paragraph: ' + content + '\n';
+                    }
+                });
+                
+                const services = section.querySelectorAll('strong');
+                services.forEach((s, i) => {
+                    const parent = s.parentElement;
+                    text += 'Service #' + (i + 1) + ': ' + parent.textContent.trim() + '\n';
+                });
+                
+                if (bullets.length > 0) {
+                    text += 'Bullets:\n';
+                    bullets.forEach(li => text += '  - ' + li.textContent.trim() + '\n');
+                }
+                
+                text += '\n';
+            });
+            
+            const finalCta = document.querySelector('.final-cta');
+            if (finalCta) {
+                text += '--- NEWSLETTER CTA SECTION ---\n';
+                const h2 = finalCta.querySelector('h2');
+                const p = finalCta.querySelector('p');
+                const btn = finalCta.querySelector('button');
+                if (h2) text += 'Headline: ' + h2.textContent.trim() + '\n';
+                if (p) text += 'Paragraph: ' + p.textContent.trim() + '\n';
+                if (btn) text += 'Button Text: ' + btn.textContent.trim() + '\n';
+            }
+            
+            return text;
+        }
+
+        function downloadTextFile(text, filename) {
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Set active button and field visibility on page load
         document.addEventListener('DOMContentLoaded', function() {
             const pageType = document.getElementById('page_type').value || 'homepage';
             document.querySelectorAll('.preset-btn').forEach(btn => {
@@ -763,7 +1007,22 @@ OUTPUT FORMAT (JSON):
                     btn.classList.add('active');
                 }
             });
-            updateCityFieldVisibility(pageType);
+            updateFieldVisibility(pageType);
+            
+            // Initialize prompt display with prose only
+            const prose = PRESETS_PROSE[pageType];
+            const json = PRESETS_JSON[pageType];
+            if (prose) {
+                document.getElementById('prompt_display').value = prose;
+                document.getElementById('prompt_instructions').value = prose + json;
+            }
+            
+            // Sync prompt_display changes to hidden field (append JSON)
+            document.getElementById('prompt_display').addEventListener('input', function() {
+                const currentPageType = document.getElementById('page_type').value || 'homepage';
+                const currentJson = PRESETS_JSON[currentPageType];
+                document.getElementById('prompt_instructions').value = this.value + currentJson;
+            });
         });
     </script>
 </body>
