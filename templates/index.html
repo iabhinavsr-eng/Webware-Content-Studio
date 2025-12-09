@@ -8,358 +8,73 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
-        }
-
-        .app-container {
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            min-height: 100vh;
-        }
-
-        .input-panel {
-            background: white;
-            border-right: 1px solid #e2e8f0;
-            padding: 1.5rem;
-            overflow-y: auto;
-            max-height: 100vh;
-            position: sticky;
-            top: 0;
-        }
-
-        .input-panel h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: #0f172a;
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        label {
-            display: block;
-            font-weight: 500;
-            font-size: 0.8rem;
-            color: #374151;
-            margin-bottom: 0.4rem;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 0.6rem;
-            font-size: 0.85rem;
-            font-family: inherit;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            resize: vertical;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-        }
-
-        .icp-uvp-input {
-            min-height: 120px;
-        }
-
-        .prompt-input {
-            min-height: 100px;
-            font-size: 0.75rem;
-        }
-
-        .preset-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-            margin-bottom: 1rem;
-        }
-
-        .preset-btn {
-            background-color: #f1f5f9;
-            color: #475569;
-            font-size: 0.75rem;
-            font-weight: 500;
-            padding: 0.4rem 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .preset-btn:hover {
-            background-color: #e2e8f0;
-        }
-
-        .preset-btn.active {
-            background-color: #1e293b;
-            color: white;
-            border-color: #1e293b;
-        }
-
-        .submit-btn {
-            width: 100%;
-            background-color: #1e293b;
-            color: white;
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .submit-btn:hover {
-            background-color: #334155;
-        }
-
-        .preview-panel {
-            background-color: #f1f5f9;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        .preview-container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .preview-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 1rem;
-        }
-
-        .error-box {
-            background-color: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Website Preview Styles */
-        .website-preview {
-            background: white;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .hero-section {
-            background-color: #1e293b;
-            color: white;
-            padding: 3rem 2rem;
-        }
-
-        .hero-section h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 1rem;
-        }
-
-        .hero-section p {
-            font-size: 1rem;
-            opacity: 0.9;
-            line-height: 1.7;
-        }
-
-        .blog-section {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
-            padding: 2.5rem 2rem;
-            background-color: #faf8f5;
-        }
-
-        .blog-section h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            line-height: 1.3;
-        }
-
-        .blog-section p {
-            font-size: 0.9rem;
-            color: #475569;
-            line-height: 1.7;
-        }
-
-        .trust-bar {
-            background-color: #1e293b;
-            color: white;
-            text-align: center;
-            padding: 1.5rem;
-        }
-
-        .trust-bar h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .value-prop {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: 280px;
-        }
-
-        .value-prop-image {
-            background-color: #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
-            font-size: 0.875rem;
-        }
-
-        .value-prop-content {
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .value-prop-content.dark {
-            background-color: #1e293b;
-            color: white;
-        }
-
-        .value-prop-content h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-        }
-
-        .value-prop-content p {
-            font-size: 0.9rem;
-            line-height: 1.7;
-            margin-bottom: 1rem;
-            opacity: 0.9;
-        }
-
-        .testimonial {
-            font-style: italic;
-            margin-bottom: 0.5rem;
-        }
-
-        .testimonial-name {
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .final-cta {
-            text-align: center;
-            padding: 3rem 2rem;
-        }
-
-        .final-cta h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .final-cta p {
-            font-size: 0.95rem;
-            color: #475569;
-            max-width: 700px;
-            margin: 0 auto 1.5rem;
-            line-height: 1.7;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background-color: white;
-            color: #1e293b;
-            border: 2px solid #1e293b;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            border-radius: 0.25rem;
-        }
-
-        .footer-bar {
-            background-color: #1e293b;
-            height: 60px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: #64748b;
-        }
-
-        .empty-state h2 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-            color: #475569;
-        }
-
-        .raw-json-toggle {
-            margin-top: 1rem;
-            text-align: right;
-        }
-
-        .raw-json-toggle button {
-            background: none;
-            border: none;
-            color: #3b82f6;
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .raw-json {
-            display: none;
-            background-color: #1e293b;
-            color: #e2e8f0;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-            font-family: monospace;
-            font-size: 0.8rem;
-            white-space: pre-wrap;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .raw-json.visible {
-            display: block;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f8fafc; color: #1e293b; line-height: 1.6; }
+        .app-container { display: grid; grid-template-columns: 400px 1fr; min-height: 100vh; }
+        .input-panel { background: white; border-right: 1px solid #e2e8f0; padding: 1.5rem; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
+        .input-panel h1 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; color: #0f172a; }
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; font-weight: 500; font-size: 0.8rem; color: #374151; margin-bottom: 0.4rem; }
+        textarea { width: 100%; padding: 0.6rem; font-size: 0.85rem; font-family: inherit; border: 1px solid #d1d5db; border-radius: 0.375rem; resize: vertical; }
+        textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
+        .icp-uvp-input { min-height: 120px; }
+        .prompt-input { min-height: 100px; font-size: 0.75rem; }
+        .preset-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+        .preset-btn { background-color: #f1f5f9; color: #475569; font-size: 0.75rem; font-weight: 500; padding: 0.4rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.25rem; cursor: pointer; transition: all 0.2s; }
+        .preset-btn:hover { background-color: #e2e8f0; }
+        .preset-btn.active { background-color: #1e293b; color: white; border-color: #1e293b; }
+        .submit-btn { width: 100%; background-color: #1e293b; color: white; font-size: 0.9rem; font-weight: 600; padding: 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s; }
+        .submit-btn:hover { background-color: #334155; }
+        .preview-panel { background-color: #f1f5f9; padding: 2rem; overflow-y: auto; }
+        .preview-container { max-width: 900px; margin: 0 auto; }
+        .preview-label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+        .error-box { background-color: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .website-preview { background: white; border-radius: 0.5rem; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .hero-section { background-color: #1e293b; color: white; padding: 3rem 2rem; }
+        .hero-section h1 { font-size: 2rem; font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+        .hero-section p { font-size: 1rem; opacity: 0.9; line-height: 1.7; }
+        .section-block { padding: 2rem; border-bottom: 1px solid #e2e8f0; }
+        .section-block:last-child { border-bottom: none; }
+        .section-block h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: #0f172a; }
+        .section-block h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #1e293b; }
+        .section-block p { font-size: 0.9rem; color: #475569; line-height: 1.7; margin-bottom: 0.75rem; }
+        .section-block ul { margin-left: 1.25rem; margin-bottom: 1rem; }
+        .section-block li { font-size: 0.9rem; color: #475569; margin-bottom: 0.5rem; line-height: 1.6; }
+        .step-item { background-color: #f8fafc; padding: 1rem; border-radius: 0.375rem; margin-bottom: 0.75rem; }
+        .step-item h4 { font-size: 0.9rem; font-weight: 600; color: #1e293b; margin-bottom: 0.25rem; }
+        .step-item p { margin-bottom: 0; }
+        .use-case-item { background-color: #faf8f5; padding: 1rem; border-radius: 0.375rem; margin-bottom: 0.5rem; }
+        .faq-item { margin-bottom: 1rem; }
+        .faq-item h4 { font-size: 0.9rem; font-weight: 600; color: #1e293b; margin-bottom: 0.25rem; }
+        .blog-section { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; padding: 2.5rem 2rem; background-color: #faf8f5; }
+        .blog-section h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+        .blog-section p { font-size: 0.9rem; color: #475569; line-height: 1.7; }
+        .trust-bar { background-color: #1e293b; color: white; text-align: center; padding: 1.5rem; }
+        .trust-bar h3 { font-size: 1.25rem; font-weight: 600; }
+        .value-prop { display: grid; grid-template-columns: 1fr 1fr; min-height: 280px; }
+        .value-prop-image { background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.875rem; }
+        .value-prop-content { padding: 2rem; display: flex; flex-direction: column; justify-content: center; }
+        .value-prop-content.dark { background-color: #1e293b; color: white; }
+        .value-prop-content h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .value-prop-content p { font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem; opacity: 0.9; }
+        .testimonial { font-style: italic; margin-bottom: 0.5rem; }
+        .testimonial-name { font-size: 0.85rem; font-weight: 600; }
+        .final-cta { text-align: center; padding: 3rem 2rem; background-color: #f8fafc; }
+        .final-cta h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .final-cta p { font-size: 0.95rem; color: #475569; max-width: 700px; margin: 0 auto 1.5rem; line-height: 1.7; }
+        .cta-button { display: inline-block; background-color: white; color: #1e293b; border: 2px solid #1e293b; padding: 0.75rem 1.5rem; font-weight: 600; border-radius: 0.25rem; }
+        .footer-bar { background-color: #1e293b; height: 60px; }
+        .empty-state { text-align: center; padding: 4rem 2rem; color: #64748b; }
+        .empty-state h2 { font-size: 1.25rem; margin-bottom: 0.5rem; color: #475569; }
+        .raw-json-toggle { margin-top: 1rem; text-align: right; }
+        .raw-json-toggle button { background: none; border: none; color: #3b82f6; font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
+        .raw-json { display: none; background-color: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+        .raw-json.visible { display: block; }
         @media (max-width: 900px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-
-            .input-panel {
-                position: relative;
-                max-height: none;
-            }
-
-            .value-prop {
-                grid-template-columns: 1fr;
-            }
-
-            .blog-section {
-                grid-template-columns: 1fr;
-            }
+            .app-container { grid-template-columns: 1fr; }
+            .input-panel { position: relative; max-height: none; }
+            .value-prop { grid-template-columns: 1fr; }
+            .blog-section { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -368,13 +83,15 @@
         <div class="input-panel">
             <h1>SEO Content Generator</h1>
 
-            <div class="preset-buttons">
-                <button type="button" class="preset-btn active" onclick="loadPreset('homepage')">Homepage</button>
-                <button type="button" class="preset-btn" onclick="loadPreset('service_page')">Service Page</button>
-                <button type="button" class="preset-btn" onclick="loadPreset('service_area')">Service Area</button>
-            </div>
-
             <form method="POST" action="/">
+                <div class="preset-buttons">
+                    <button type="button" class="preset-btn active" data-preset="homepage" onclick="loadPreset('homepage')">Homepage</button>
+                    <button type="button" class="preset-btn" data-preset="service_page" onclick="loadPreset('service_page')">Service Page</button>
+                    <button type="button" class="preset-btn" data-preset="service_area" onclick="loadPreset('service_area')">Service Area</button>
+                </div>
+
+                <input type="hidden" name="page_type" id="page_type" value="{{ page_type or 'homepage' }}">
+
                 <div class="form-group">
                     <label for="icp">ICP (Ideal Customer Profile)</label>
                     <textarea name="icp" id="icp" class="icp-uvp-input" placeholder="Paste your ICP here...">{{ icp }}</textarea>
@@ -404,15 +121,14 @@
                 <div class="error-box">{{ error }}</div>
                 {% endif %}
 
-                {% if parsed_output %}
+                {% if parsed_output and page_type == 'homepage' %}
+                <!-- HOMEPAGE PREVIEW -->
                 <div class="website-preview">
-                    <!-- Hero Section -->
                     <div class="hero-section">
                         <h1>{{ parsed_output.hero_section.h1 if parsed_output.hero_section else 'Your Headline Here' }}</h1>
                         <p>{{ parsed_output.hero_section.paragraph if parsed_output.hero_section else '' }}</p>
                     </div>
 
-                    <!-- Blog/Guide Section -->
                     {% if parsed_output.blog_guide_section %}
                     <div class="blog-section">
                         <h2>{{ parsed_output.blog_guide_section.headline }}</h2>
@@ -420,12 +136,10 @@
                     </div>
                     {% endif %}
 
-                    <!-- Trust Bar -->
                     <div class="trust-bar">
                         <h3>Trusted by local homeowners and businesses</h3>
                     </div>
 
-                    <!-- Value Prop 1 -->
                     {% if parsed_output.value_prop_1 %}
                     <div class="value-prop">
                         <div class="value-prop-image">[Image]</div>
@@ -438,7 +152,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- Value Prop 2 -->
                     {% if parsed_output.value_prop_2 %}
                     <div class="value-prop">
                         <div class="value-prop-content dark">
@@ -451,7 +164,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- Value Prop 3 -->
                     {% if parsed_output.value_prop_3 %}
                     <div class="value-prop">
                         <div class="value-prop-image">[Image]</div>
@@ -464,7 +176,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- Final CTA -->
                     {% if parsed_output.final_cta_section %}
                     <div class="final-cta">
                         <h2>{{ parsed_output.final_cta_section.headline }}</h2>
@@ -476,10 +187,94 @@
                     <div class="footer-bar"></div>
                 </div>
 
-                <div class="raw-json-toggle">
-                    <button onclick="toggleRawJson()">Show Raw JSON</button>
+                {% elif parsed_output and page_type == 'service_page' %}
+                <!-- SERVICE PAGE PREVIEW -->
+                <div class="website-preview">
+                    <div class="hero-section">
+                        <h1>{{ parsed_output.hero_section.h1 if parsed_output.hero_section else 'Service Page' }}</h1>
+                        <p>{{ parsed_output.hero_section.intro if parsed_output.hero_section else '' }}</p>
+                        {% if parsed_output.hero_section and parsed_output.hero_section.cta %}
+                        <p style="margin-top: 1rem; font-weight: 600;">{{ parsed_output.hero_section.cta }}</p>
+                        {% endif %}
+                    </div>
+
+                    {% if parsed_output.service_overview_section %}
+                    <div class="section-block">
+                        <h2>Service Overview</h2>
+                        {% if parsed_output.service_overview_section is string %}
+                        <p>{{ parsed_output.service_overview_section }}</p>
+                        {% elif parsed_output.service_overview_section.paragraphs %}
+                        {% for para in parsed_output.service_overview_section.paragraphs %}
+                        <p>{{ para }}</p>
+                        {% endfor %}
+                        {% else %}
+                        <p>{{ parsed_output.service_overview_section }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_output.key_benefits_section %}
+                    <div class="section-block" style="background-color: #faf8f5;">
+                        <h2>Key Benefits</h2>
+                        <ul>
+                        {% if parsed_output.key_benefits_section is iterable and parsed_output.key_benefits_section is not string %}
+                        {% for benefit in parsed_output.key_benefits_section %}
+                        <li>{{ benefit }}</li>
+                        {% endfor %}
+                        {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_output.process_section %}
+                    <div class="section-block">
+                        <h2>How It Works</h2>
+                        {% if parsed_output.process_section is iterable and parsed_output.process_section is not string %}
+                        {% for step in parsed_output.process_section %}
+                        <div class="step-item">
+                            <h4>{{ step.title if step.title else 'Step ' ~ loop.index }}</h4>
+                            <p>{{ step.description if step.description else step }}</p>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_output.use_cases_section %}
+                    <div class="section-block" style="background-color: #f8fafc;">
+                        <h2>When You Need This Service</h2>
+                        {% if parsed_output.use_cases_section is iterable and parsed_output.use_cases_section is not string %}
+                        {% for case in parsed_output.use_cases_section %}
+                        <div class="use-case-item">
+                            <p style="margin-bottom: 0;">{{ case }}</p>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_output.faq_section %}
+                    <div class="section-block">
+                        <h2>Frequently Asked Questions</h2>
+                        {% if parsed_output.faq_section is iterable and parsed_output.faq_section is not string %}
+                        {% for faq in parsed_output.faq_section %}
+                        <div class="faq-item">
+                            <h4>{{ faq.question if faq.question else faq }}</h4>
+                            <p>{{ faq.answer if faq.answer else '' }}</p>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if parsed_output.final_cta_section %}
+                    <div class="final-cta">
+                        <p>{{ parsed_output.final_cta_section if parsed_output.final_cta_section is string else parsed_output.final_cta_section.paragraph }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="footer-bar"></div>
                 </div>
-                <pre class="raw-json" id="rawJson">{{ model_output }}</pre>
 
                 {% elif model_output %}
                 <!-- Fallback for non-JSON output -->
@@ -488,11 +283,19 @@
                         <pre style="white-space: pre-wrap; font-family: inherit;">{{ model_output }}</pre>
                     </div>
                 </div>
+
                 {% else %}
                 <div class="empty-state">
                     <h2>Enter your ICP and UVP</h2>
-                    <p>Click "Generate Content" to see a preview of your homepage content</p>
+                    <p>Click "Generate Content" to see a preview</p>
                 </div>
+                {% endif %}
+
+                {% if model_output %}
+                <div class="raw-json-toggle">
+                    <button onclick="toggleRawJson()">Show Raw JSON</button>
+                </div>
+                <pre class="raw-json" id="rawJson">{{ model_output }}</pre>
                 {% endif %}
             </div>
         </div>
@@ -606,62 +409,41 @@ Do not invent new service offerings.
 
 Structural Requirements (MUST output ALL sections):
 
-Your JSON output must include the following keys, in exactly this structure:
+Your JSON output must include the following keys:
 
-1. hero_section
-
-Content that appears at the top of the service page.
-
-Uses the given H1 from page_structure.
-
-2-3 sentence intro summarising the service and its value.
-
-Short CTA sentence (e.g., "Get started today").
-
-2. service_overview_section
-
-Explains what the service includes and who it's for.
-
-2-3 paragraph summary
-
-Must tie directly to ICP needs and UVP value
-
-No invented features
-
-3. key_benefits_section
-
-3-5 benefits tied to the ICP and service outcomes.
-Each bullet: 1-2 sentences.
-
-4. process_section
-
-Explain how this service works, step-by-step.
-
-3-5 steps
-
-Each step includes title + 1-2 sentence explanation.
-
-Must reflect the actual process used in this type of service (generic but accurate).
-
-5. use_cases_section
-
-3 examples of when or why a customer would need this service.
-Each example: 1-2 sentences.
-
-6. faq_section
-
-3 FAQs, each with:
-
-clear, concise question
-
-2-3 sentence answer
-
-Must NOT include guarantees, pricing, or legal claims unless provided.
-
-7. final_cta_section
-
-2-3 sentence closing paragraph encouraging the user to take the next step.
-No contact details.`,
+{
+  "hero_section": {
+    "h1": "Main headline from page_structure",
+    "intro": "2-3 sentence intro summarising the service and its value.",
+    "cta": "Short CTA sentence (e.g., Get started today)"
+  },
+  "service_overview_section": {
+    "paragraphs": ["Paragraph 1", "Paragraph 2", "Paragraph 3"]
+  },
+  "key_benefits_section": [
+    "Benefit 1: 1-2 sentences",
+    "Benefit 2: 1-2 sentences",
+    "Benefit 3: 1-2 sentences"
+  ],
+  "process_section": [
+    {"title": "Step 1 title", "description": "1-2 sentence explanation"},
+    {"title": "Step 2 title", "description": "1-2 sentence explanation"},
+    {"title": "Step 3 title", "description": "1-2 sentence explanation"}
+  ],
+  "use_cases_section": [
+    "Use case 1: 1-2 sentences",
+    "Use case 2: 1-2 sentences",
+    "Use case 3: 1-2 sentences"
+  ],
+  "faq_section": [
+    {"question": "FAQ question 1", "answer": "2-3 sentence answer"},
+    {"question": "FAQ question 2", "answer": "2-3 sentence answer"},
+    {"question": "FAQ question 3", "answer": "2-3 sentence answer"}
+  ],
+  "final_cta_section": {
+    "paragraph": "2-3 sentence closing encouraging the user to take the next step."
+  }
+}`,
 
             service_area: `[Service Area Page prompt coming soon - please provide the prompt]`
         };
@@ -670,6 +452,7 @@ No contact details.`,
             const prompt = PRESETS[name];
             if (prompt) {
                 document.getElementById('prompt_instructions').value = prompt;
+                document.getElementById('page_type').value = name;
                 
                 document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
                 event.target.classList.add('active');
@@ -680,6 +463,17 @@ No contact details.`,
             const el = document.getElementById('rawJson');
             el.classList.toggle('visible');
         }
+
+        // Set active button on page load based on page_type
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageType = document.getElementById('page_type').value || 'homepage';
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.preset === pageType) {
+                    btn.classList.add('active');
+                }
+            });
+        });
     </script>
 </body>
 </html>

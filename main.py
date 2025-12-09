@@ -82,6 +82,76 @@ Your output must be valid JSON with these exact keys:
   }
 }"""
 
+DEFAULT_SERVICE_PAGE_PROMPT = """Role:
+You are an expert SEO website copywriter.
+Your job is to generate full service page content using the ICP, UVP, and SEO page structure provided.
+Your output must be strictly formatted JSON, use British English, and follow all constraints.
+
+RULES (MUST FOLLOW ALL):
+Language & Style
+
+British English only.
+
+Standard ASCII only (no curly quotes, emojis, special characters).
+
+Professional, informative, calm tone - no exaggerated claims.
+
+Do not repeat the business name more than once unless provided in the structure.
+
+Do not include: phone numbers, emails, URLs, pricing, owner names, awards, claims of superiority.
+
+No location mentions unless explicitly present in the service_areas input.
+
+SEO Constraints
+
+Use the provided H1 and naturally integrate relevant keywords.
+
+Do not keyword-stuff.
+
+Do not produce a list of keywords - integrate them into prose.
+
+Only use services/products explicitly provided.
+
+Do not invent new service offerings.
+
+Structural Requirements (MUST output ALL sections):
+
+Your JSON output must include the following keys:
+
+{
+  "hero_section": {
+    "h1": "Main headline from page_structure",
+    "intro": "2-3 sentence intro summarising the service and its value.",
+    "cta": "Short CTA sentence (e.g., Get started today)"
+  },
+  "service_overview_section": {
+    "paragraphs": ["Paragraph 1", "Paragraph 2", "Paragraph 3"]
+  },
+  "key_benefits_section": [
+    "Benefit 1: 1-2 sentences",
+    "Benefit 2: 1-2 sentences",
+    "Benefit 3: 1-2 sentences"
+  ],
+  "process_section": [
+    {"title": "Step 1 title", "description": "1-2 sentence explanation"},
+    {"title": "Step 2 title", "description": "1-2 sentence explanation"},
+    {"title": "Step 3 title", "description": "1-2 sentence explanation"}
+  ],
+  "use_cases_section": [
+    "Use case 1: 1-2 sentences",
+    "Use case 2: 1-2 sentences",
+    "Use case 3: 1-2 sentences"
+  ],
+  "faq_section": [
+    {"question": "FAQ question 1", "answer": "2-3 sentence answer"},
+    {"question": "FAQ question 2", "answer": "2-3 sentence answer"},
+    {"question": "FAQ question 3", "answer": "2-3 sentence answer"}
+  ],
+  "final_cta_section": {
+    "paragraph": "2-3 sentence closing encouraging the user to take the next step."
+  }
+}"""
+
 
 def get_openai_client():
     """Get OpenAI client, raising error if API key not configured."""
@@ -105,6 +175,13 @@ def call_openai(system_prompt, user_prompt, model="gpt-4.1-mini"):
     return response.choices[0].message.content
 
 
+def get_default_prompt(page_type):
+    """Get default prompt based on page type."""
+    if page_type == "service_page":
+        return DEFAULT_SERVICE_PAGE_PROMPT
+    return DEFAULT_HOMEPAGE_PROMPT
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     model_output = None
@@ -113,16 +190,18 @@ def index():
     icp = ""
     uvp = ""
     prompt_instructions = ""
+    page_type = "homepage"
     model = "gpt-4.1-mini"
 
     if request.method == "POST":
         icp = request.form.get("icp", "").strip()
         uvp = request.form.get("uvp", "").strip()
         prompt_instructions = request.form.get("prompt_instructions", "").strip()
+        page_type = request.form.get("page_type", "homepage").strip()
         model = request.form.get("model", "").strip() or "gpt-4.1-mini"
 
         if not prompt_instructions:
-            prompt_instructions = DEFAULT_HOMEPAGE_PROMPT
+            prompt_instructions = get_default_prompt(page_type)
 
         try:
             user_message = f"Here is the current data:\n\nICP:\n{icp}\n\nUVP:\n{uvp}"
@@ -157,7 +236,8 @@ def index():
         icp=icp,
         uvp=uvp,
         prompt_instructions=prompt_instructions,
-        default_prompt=DEFAULT_HOMEPAGE_PROMPT,
+        page_type=page_type,
+        default_prompt=get_default_prompt(page_type),
         model=model,
     )
 
