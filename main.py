@@ -466,6 +466,13 @@ UVP:
             error = str(e)
             logging.error(f"Error: {e}")
 
+    # Extract prose portion (before OUTPUT FORMAT or Homepage Structure)
+    prompt_instructions_prose = prompt_instructions
+    for marker in ["OUTPUT FORMAT (JSON):", "Homepage Structure (MUST output all sections):", "Structural Requirements (MUST output ALL sections):"]:
+        if marker in prompt_instructions:
+            prompt_instructions_prose = prompt_instructions.split(marker)[0].strip()
+            break
+    
     return render_template(
         "index.html",
         model_output=model_output,
@@ -476,6 +483,7 @@ UVP:
         city=city,
         service_name=service_name,
         prompt_instructions=prompt_instructions,
+        prompt_instructions_prose=prompt_instructions_prose,
         page_type=page_type,
         default_prompt=get_default_prompt(page_type),
         model=model,
