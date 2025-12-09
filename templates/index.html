@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Tester</title>
+    <title>SEO Content Generator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -19,266 +19,482 @@
             background-color: #f8fafc;
             color: #1e293b;
             line-height: 1.6;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
             min-height: 100vh;
         }
 
-        .container {
-            max-width: 56rem;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
-
-        .card {
+        .input-panel {
             background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
+            border-right: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 100vh;
+            position: sticky;
+            top: 0;
         }
 
-        .header {
-            padding-bottom: 2rem;
-            border-bottom: 1px solid #e2e8f0;
-            margin-bottom: 2rem;
-        }
-
-        .header h1 {
-            font-size: 1.875rem;
+        .input-panel h1 {
+            font-size: 1.25rem;
             font-weight: 600;
+            margin-bottom: 1.5rem;
             color: #0f172a;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            color: #64748b;
-            font-size: 1rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         label {
             display: block;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             color: #374151;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
-        input[type="text"],
         textarea {
             width: 100%;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
+            padding: 0.6rem;
+            font-size: 0.85rem;
             font-family: inherit;
             border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            background-color: white;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            border-radius: 0.375rem;
+            resize: vertical;
         }
 
-        input[type="text"]:focus,
         textarea:focus {
             outline: none;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
         }
 
-        textarea {
-            min-height: 10rem;
-            resize: vertical;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
+        .icp-uvp-input {
+            min-height: 120px;
         }
 
-        .model-input {
-            max-width: 16rem;
-        }
-
-        .preset-section {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .preset-section label {
-            margin-bottom: 0.75rem;
+        .prompt-input {
+            min-height: 100px;
+            font-size: 0.75rem;
         }
 
         .preset-buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
         }
 
         .preset-btn {
             background-color: #f1f5f9;
             color: #475569;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.75rem;
             border: 1px solid #e2e8f0;
-            border-radius: 0.375rem;
+            border-radius: 0.25rem;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .preset-btn:hover {
             background-color: #e2e8f0;
-            border-color: #cbd5e1;
         }
 
         .preset-btn.active {
-            background-color: #3b82f6;
+            background-color: #1e293b;
             color: white;
-            border-color: #3b82f6;
+            border-color: #1e293b;
         }
 
-        .submit-container {
-            display: flex;
-            justify-content: flex-start;
-            padding-top: 1rem;
-        }
-
-        button[type="submit"] {
-            background-color: #3b82f6;
+        .submit-btn {
+            width: 100%;
+            background-color: #1e293b;
             color: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            padding: 0.75rem 2rem;
+            padding: 0.75rem;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 0.375rem;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
-        button[type="submit"]:hover {
-            background-color: #2563eb;
+        .submit-btn:hover {
+            background-color: #334155;
         }
 
-        button[type="submit"]:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
-        }
-
-        .output-section {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .output-section h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .output-content {
-            background-color: #1e293b;
-            color: #e2e8f0;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            overflow-x: auto;
-            max-height: 37.5rem;
+        .preview-panel {
+            background-color: #f1f5f9;
+            padding: 2rem;
             overflow-y: auto;
         }
 
-        .output-content pre {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            margin: 0;
+        .preview-container {
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        .error-content {
+        .preview-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .error-box {
             background-color: #fef2f2;
             border: 1px solid #fecaca;
             color: #991b1b;
-            border-radius: 0.75rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Website Preview Styles */
+        .website-preview {
+            background: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-section {
+            background-color: #1e293b;
+            color: white;
+            padding: 3rem 2rem;
+        }
+
+        .hero-section h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .hero-section p {
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.7;
+        }
+
+        .blog-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            padding: 2.5rem 2rem;
+            background-color: #faf8f5;
+        }
+
+        .blog-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .blog-section p {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.7;
+        }
+
+        .trust-bar {
+            background-color: #1e293b;
+            color: white;
+            text-align: center;
             padding: 1.5rem;
         }
 
-        @media (max-width: 640px) {
-            .container {
-                padding: 1rem;
+        .trust-bar h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .value-prop {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 280px;
+        }
+
+        .value-prop-image {
+            background-color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        .value-prop-content {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .value-prop-content.dark {
+            background-color: #1e293b;
+            color: white;
+        }
+
+        .value-prop-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .value-prop-content p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .testimonial {
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .testimonial-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .final-cta {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .final-cta h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .final-cta p {
+            font-size: 0.95rem;
+            color: #475569;
+            max-width: 700px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.7;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: white;
+            color: #1e293b;
+            border: 2px solid #1e293b;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 0.25rem;
+        }
+
+        .footer-bar {
+            background-color: #1e293b;
+            height: 60px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+
+        .empty-state h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #475569;
+        }
+
+        .raw-json-toggle {
+            margin-top: 1rem;
+            text-align: right;
+        }
+
+        .raw-json-toggle button {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .raw-json {
+            display: none;
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .raw-json.visible {
+            display: block;
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
             }
 
-            .card {
-                padding: 1.5rem;
+            .input-panel {
+                position: relative;
+                max-height: none;
             }
 
-            button[type="submit"] {
-                width: 100%;
+            .value-prop {
+                grid-template-columns: 1fr;
             }
 
-            .model-input {
-                max-width: 100%;
+            .blog-section {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1>Prompt Tester</h1>
-                <p>Paste your ICP, UVP, and prompt instructions, then run to see the model's response</p>
+    <div class="app-container">
+        <div class="input-panel">
+            <h1>SEO Content Generator</h1>
+
+            <div class="preset-buttons">
+                <button type="button" class="preset-btn active" onclick="loadPreset('homepage')">Homepage</button>
+                <button type="button" class="preset-btn" onclick="loadPreset('service_page')">Service Page</button>
+                <button type="button" class="preset-btn" onclick="loadPreset('service_area')">Service Area</button>
             </div>
 
             <form method="POST" action="/">
-                <div class="preset-section">
-                    <label>Preset Prompts</label>
-                    <div class="preset-buttons">
-                        <button type="button" class="preset-btn" onclick="loadPreset('homepage')">Homepage Content</button>
-                        <button type="button" class="preset-btn" onclick="loadPreset('service_page')">Service Page</button>
-                        <button type="button" class="preset-btn" onclick="loadPreset('service_area')">Service Area Page</button>
+                <div class="form-group">
+                    <label for="icp">ICP (Ideal Customer Profile)</label>
+                    <textarea name="icp" id="icp" class="icp-uvp-input" placeholder="Paste your ICP here...">{{ icp }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="uvp">UVP (Unique Value Proposition)</label>
+                    <textarea name="uvp" id="uvp" class="icp-uvp-input" placeholder="Paste your UVP here...">{{ uvp }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="prompt_instructions">System Prompt</label>
+                    <textarea name="prompt_instructions" id="prompt_instructions" class="prompt-input">{{ prompt_instructions if prompt_instructions else default_prompt }}</textarea>
+                </div>
+
+                <input type="hidden" name="model" value="gpt-4.1-mini">
+
+                <button type="submit" class="submit-btn">Generate Content</button>
+            </form>
+        </div>
+
+        <div class="preview-panel">
+            <div class="preview-container">
+                <div class="preview-label">Preview</div>
+
+                {% if error %}
+                <div class="error-box">{{ error }}</div>
+                {% endif %}
+
+                {% if parsed_output %}
+                <div class="website-preview">
+                    <!-- Hero Section -->
+                    <div class="hero-section">
+                        <h1>{{ parsed_output.hero_section.h1 if parsed_output.hero_section else 'Your Headline Here' }}</h1>
+                        <p>{{ parsed_output.hero_section.paragraph if parsed_output.hero_section else '' }}</p>
+                    </div>
+
+                    <!-- Blog/Guide Section -->
+                    {% if parsed_output.blog_guide_section %}
+                    <div class="blog-section">
+                        <h2>{{ parsed_output.blog_guide_section.headline }}</h2>
+                        <p>{{ parsed_output.blog_guide_section.paragraph }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Trust Bar -->
+                    <div class="trust-bar">
+                        <h3>Trusted by local homeowners and businesses</h3>
+                    </div>
+
+                    <!-- Value Prop 1 -->
+                    {% if parsed_output.value_prop_1 %}
+                    <div class="value-prop">
+                        <div class="value-prop-image">[Image]</div>
+                        <div class="value-prop-content">
+                            <h3>{{ parsed_output.value_prop_1.headline }}</h3>
+                            <p>{{ parsed_output.value_prop_1.paragraph }}</p>
+                            <p class="testimonial">{{ parsed_output.value_prop_1.testimonial_quote }}</p>
+                            <span class="testimonial-name">{{ parsed_output.value_prop_1.testimonial_name }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Value Prop 2 -->
+                    {% if parsed_output.value_prop_2 %}
+                    <div class="value-prop">
+                        <div class="value-prop-content dark">
+                            <h3>{{ parsed_output.value_prop_2.headline }}</h3>
+                            <p>{{ parsed_output.value_prop_2.paragraph }}</p>
+                            <p class="testimonial">{{ parsed_output.value_prop_2.testimonial_quote }}</p>
+                            <span class="testimonial-name">{{ parsed_output.value_prop_2.testimonial_name }}</span>
+                        </div>
+                        <div class="value-prop-image">[Image]</div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Value Prop 3 -->
+                    {% if parsed_output.value_prop_3 %}
+                    <div class="value-prop">
+                        <div class="value-prop-image">[Image]</div>
+                        <div class="value-prop-content">
+                            <h3>{{ parsed_output.value_prop_3.headline }}</h3>
+                            <p>{{ parsed_output.value_prop_3.paragraph }}</p>
+                            <p class="testimonial">{{ parsed_output.value_prop_3.testimonial_quote }}</p>
+                            <span class="testimonial-name">{{ parsed_output.value_prop_3.testimonial_name }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Final CTA -->
+                    {% if parsed_output.final_cta_section %}
+                    <div class="final-cta">
+                        <h2>{{ parsed_output.final_cta_section.headline }}</h2>
+                        <p>{{ parsed_output.final_cta_section.paragraph }}</p>
+                        <span class="cta-button">{{ parsed_output.final_cta_section.button_text }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="footer-bar"></div>
+                </div>
+
+                <div class="raw-json-toggle">
+                    <button onclick="toggleRawJson()">Show Raw JSON</button>
+                </div>
+                <pre class="raw-json" id="rawJson">{{ model_output }}</pre>
+
+                {% elif model_output %}
+                <!-- Fallback for non-JSON output -->
+                <div class="website-preview">
+                    <div class="hero-section">
+                        <pre style="white-space: pre-wrap; font-family: inherit;">{{ model_output }}</pre>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="icp">ICP (JSON or text)</label>
-                    <textarea name="icp" id="icp" placeholder="Paste your Ideal Customer Profile here...">{{ icp }}</textarea>
+                {% else %}
+                <div class="empty-state">
+                    <h2>Enter your ICP and UVP</h2>
+                    <p>Click "Generate Content" to see a preview of your homepage content</p>
                 </div>
-
-                <div class="form-group">
-                    <label for="uvp">UVP (JSON or text)</label>
-                    <textarea name="uvp" id="uvp" placeholder="Paste your Unique Value Proposition here...">{{ uvp }}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="prompt_instructions">Prompt / Instructions (SYSTEM message)</label>
-                    <textarea name="prompt_instructions" id="prompt_instructions" placeholder="Enter your system prompt or instructions...">{{ prompt_instructions }}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="model">Model (optional)</label>
-                    <input type="text" name="model" id="model" class="model-input" value="{{ model }}" placeholder="gpt-4.1-mini">
-                </div>
-
-                <div class="submit-container">
-                    <button type="submit">Run Prompt</button>
-                </div>
-            </form>
-
-            {% if error %}
-            <div class="output-section">
-                <h2>Error</h2>
-                <div class="error-content">
-                    <pre>{{ error }}</pre>
-                </div>
+                {% endif %}
             </div>
-            {% endif %}
-
-            {% if model_output %}
-            <div class="output-section">
-                <h2>Model Output</h2>
-                <div class="output-content">
-                    <pre>{{ model_output }}</pre>
-                </div>
-            </div>
-            {% endif %}
         </div>
     </div>
 
@@ -320,55 +536,41 @@ DO NOT include keywords as a list; integrate them in context.
 
 Homepage Structure (MUST output all sections):
 
-Your output must include the following sections EXACTLY in this order within JSON:
+Your output must be valid JSON with these exact keys:
 
-hero_section
-
-H1 (use the given one)
-
-2-3 sentence hero paragraph explaining what the business does and who it helps
-
-One clear CTA sentence (e.g., "Get started today.")
-
-value_proposition_section
-
-3 bullet points derived from UVP (each 1-2 sentences)
-
-No exaggeration; focus on measurable or practical benefits
-
-services_overview_section
-
-A short 2-3 sentence intro
-
-3-6 service blurbs (each 1-2 sentences)
-
-Use ONLY services mentioned in products/services offered
-
-why_choose_us_section
-
-3-5 bullets drawn directly from ICP + UVP pain points and motivators
-
-process_section
-
-3-4 steps explaining how the business works with its customers
-
-Each step: title + 1-2 sentences
-
-testimonials_placeholder
-
-1 short generic sample testimonial (no names)
-
-faq_section
-
-3 FAQs relevant to the service offering
-
-Each answer: 2-3 sentences
-
-final_cta_section
-
-2-3 sentences reminding the visitor why to take action
-
-No contact info; CTA only`,
+{
+  "hero_section": {
+    "h1": "Main headline",
+    "paragraph": "2-3 sentences explaining what the business does and who it helps. End with a CTA."
+  },
+  "blog_guide_section": {
+    "headline": "Question-style headline about property maintenance",
+    "paragraph": "4-6 sentences about how the guide helps customers."
+  },
+  "value_prop_1": {
+    "headline": "Short benefit headline (2-4 words)",
+    "paragraph": "2-3 sentences about this benefit.",
+    "testimonial_quote": "1 sentence testimonial",
+    "testimonial_name": "First name + last initial"
+  },
+  "value_prop_2": {
+    "headline": "Short benefit headline",
+    "paragraph": "2-3 sentences about this benefit.",
+    "testimonial_quote": "1 sentence testimonial",
+    "testimonial_name": "First name + last initial"
+  },
+  "value_prop_3": {
+    "headline": "Short benefit headline",
+    "paragraph": "2-3 sentences about this benefit.",
+    "testimonial_quote": "1 sentence testimonial",
+    "testimonial_name": "First name + last initial"
+  },
+  "final_cta_section": {
+    "headline": "Question encouraging action",
+    "paragraph": "2-3 sentences about getting started.",
+    "button_text": "CTA button text"
+  }
+}`,
 
             service_page: `Role:
 You are an expert SEO website copywriter.
@@ -472,6 +674,11 @@ No contact details.`,
                 document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
                 event.target.classList.add('active');
             }
+        }
+
+        function toggleRawJson() {
+            const el = document.getElementById('rawJson');
+            el.classList.toggle('visible');
         }
     </script>
 </body>

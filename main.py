@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -8,6 +9,78 @@ logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET")
+
+DEFAULT_HOMEPAGE_PROMPT = """SYSTEM PROMPT (Homepage Content Builder)
+
+Role:
+You are an expert website copywriter specialising in SEO-optimised homepage content, using structured inputs (ICP, UVP, and page SEO data) to produce clear, persuasive, conversion-focused content.
+
+Rules (MUST follow all):
+Language & Formatting
+
+Use British English.
+
+Output standard ASCII only (no curly quotes, no emojis).
+
+Normalise whitespace (no double spaces, no trailing spaces).
+
+Do not mention phone numbers, emails, URLs, or the business address.
+
+Do not write the business name more than once in the entire content unless the input instructs otherwise.
+
+No hype language (e.g., "world-class", "best ever").
+
+Tone: professional, direct, trustworthy.
+
+SEO & Content Requirements
+
+Use the provided H1, keywords, ICP, UVP, and any SEO page structure.
+
+Do not invent new services, locations, or claims.
+
+Do not include geographic references unless they appear in the service areas list.
+
+Naturally weave relevant keywords into the content without over-optimising.
+
+DO NOT include keywords as a list; integrate them in context.
+
+Homepage Structure (MUST output all sections):
+
+Your output must be valid JSON with these exact keys:
+
+{
+  "hero_section": {
+    "h1": "Main headline",
+    "paragraph": "2-3 sentences explaining what the business does and who it helps. End with a CTA."
+  },
+  "blog_guide_section": {
+    "headline": "Question-style headline about property maintenance",
+    "paragraph": "4-6 sentences about how the guide helps customers."
+  },
+  "value_prop_1": {
+    "headline": "Short benefit headline (2-4 words)",
+    "paragraph": "2-3 sentences about this benefit.",
+    "testimonial_quote": "1 sentence testimonial",
+    "testimonial_name": "First name + last initial"
+  },
+  "value_prop_2": {
+    "headline": "Short benefit headline",
+    "paragraph": "2-3 sentences about this benefit.",
+    "testimonial_quote": "1 sentence testimonial",
+    "testimonial_name": "First name + last initial"
+  },
+  "value_prop_3": {
+    "headline": "Short benefit headline",
+    "paragraph": "2-3 sentences about this benefit.",
+    "testimonial_quote": "1 sentence testimonial",
+    "testimonial_name": "First name + last initial"
+  },
+  "final_cta_section": {
+    "headline": "Question encouraging action",
+    "paragraph": "2-3 sentences about getting started.",
+    "button_text": "CTA button text"
+  }
+}"""
 
 
 def get_openai_client():
@@ -35,6 +108,7 @@ def call_openai(system_prompt, user_prompt, model="gpt-4.1-mini"):
 @app.route("/", methods=["GET", "POST"])
 def index():
     model_output = None
+    parsed_output = None
     error = None
     icp = ""
     uvp = ""
@@ -48,22 +122,42 @@ def index():
         model = request.form.get("model", "").strip() or "gpt-4.1-mini"
 
         if not prompt_instructions:
-            error = "Please provide prompt instructions (system message)."
-        else:
+            prompt_instructions = DEFAULT_HOMEPAGE_PROMPT
+
+        try:
+            user_message = f"Here is the current data:\n\nICP:\n{icp}\n\nUVP:\n{uvp}"
+            model_output = call_openai(prompt_instructions, user_message, model)
+            
+            # Try to parse as JSON for visual display
             try:
-                user_message = f"Here is the current data:\n\nICP:\n{icp}\n\nUVP:\n{uvp}"
-                model_output = call_openai(prompt_instructions, user_message, model)
-            except Exception as e:
-                error = str(e)
-                logging.error(f"Error: {e}")
+                # Clean up potential markdown code blocks
+                clean_output = model_output.strip()
+                if clean_output.startswith("```json"):
+                    clean_output = clean_output[7:]
+                if clean_output.startswith("```"):
+                    clean_output = clean_output[3:]
+                if clean_output.endswith("```"):
+                    clean_output = clean_output[:-3]
+                clean_output = clean_output.strip()
+                
+                parsed_output = json.loads(clean_output)
+            except json.JSONDecodeError:
+                # If not valid JSON, just show raw output
+                parsed_output = None
+                
+        except Exception as e:
+            error = str(e)
+            logging.error(f"Error: {e}")
 
     return render_template(
         "index.html",
         model_output=model_output,
+        parsed_output=parsed_output,
         error=error,
         icp=icp,
         uvp=uvp,
         prompt_instructions=prompt_instructions,
+        default_prompt=DEFAULT_HOMEPAGE_PROMPT,
         model=model,
     )
 
