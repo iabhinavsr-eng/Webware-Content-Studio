@@ -284,6 +284,7 @@ def index():
     error = None
     icp = ""
     uvp = ""
+    city = ""
     prompt_instructions = ""
     page_type = "homepage"
     model = "gpt-4.1-mini"
@@ -291,6 +292,7 @@ def index():
     if request.method == "POST":
         icp = request.form.get("icp", "").strip()
         uvp = request.form.get("uvp", "").strip()
+        city = request.form.get("city", "").strip()
         prompt_instructions = request.form.get("prompt_instructions", "").strip()
         page_type = request.form.get("page_type", "homepage").strip()
         model = request.form.get("model", "").strip() or "gpt-4.1-mini"
@@ -299,7 +301,26 @@ def index():
             prompt_instructions = get_default_prompt(page_type)
 
         try:
-            user_message = f"Here is the current data:\n\nICP:\n{icp}\n\nUVP:\n{uvp}"
+            # Build user message based on page type
+            if page_type == "service_area" and city:
+                user_message = f"""Here is the current data:
+
+TARGET LOCATION: {city}
+
+Important: Generate content specifically for {city}. Include real local context such as:
+- Local climate and weather patterns that affect property maintenance
+- Common property types and issues in the area
+- Regional considerations (bylaws, seasonal challenges, typical property sizes)
+- Neighbourhood characteristics if relevant
+
+ICP:
+{icp}
+
+UVP:
+{uvp}"""
+            else:
+                user_message = f"Here is the current data:\n\nICP:\n{icp}\n\nUVP:\n{uvp}"
+            
             model_output = call_openai(prompt_instructions, user_message, model)
             
             # Try to parse as JSON for visual display
@@ -330,6 +351,7 @@ def index():
         error=error,
         icp=icp,
         uvp=uvp,
+        city=city,
         prompt_instructions=prompt_instructions,
         page_type=page_type,
         default_prompt=get_default_prompt(page_type),

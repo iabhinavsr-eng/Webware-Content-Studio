@@ -92,6 +92,12 @@
 
                 <input type="hidden" name="page_type" id="page_type" value="{{ page_type or 'homepage' }}">
 
+                <div class="form-group" id="city-field" style="display: none;">
+                    <label for="city">Target City/Location</label>
+                    <input type="text" name="city" id="city" placeholder="e.g., Montreal, QC or Longueuil" value="{{ city or '' }}" style="padding: 0.6rem; font-size: 0.85rem; border: 1px solid #d1d5db; border-radius: 0.375rem; width: 100%;">
+                    <small style="color: #64748b; font-size: 0.7rem; margin-top: 0.25rem; display: block;">Enter the city name for location-specific content. The AI will include local context like climate, common property issues, and regional considerations.</small>
+                </div>
+
                 <div class="form-group">
                     <label for="icp">ICP (Ideal Customer Profile)</label>
                     <textarea name="icp" id="icp" class="icp-uvp-input" placeholder="Paste your ICP here...">{{ icp }}</textarea>
@@ -632,6 +638,17 @@ OUTPUT FORMAT (JSON):
                 
                 document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
                 event.target.classList.add('active');
+                
+                updateCityFieldVisibility(name);
+            }
+        }
+
+        function updateCityFieldVisibility(pageType) {
+            const cityField = document.getElementById('city-field');
+            if (pageType === 'service_area') {
+                cityField.style.display = 'block';
+            } else {
+                cityField.style.display = 'none';
             }
         }
 
@@ -640,7 +657,7 @@ OUTPUT FORMAT (JSON):
             el.classList.toggle('visible');
         }
 
-        // Set active button on page load based on page_type
+        // Set active button and city field visibility on page load
         document.addEventListener('DOMContentLoaded', function() {
             const pageType = document.getElementById('page_type').value || 'homepage';
             document.querySelectorAll('.preset-btn').forEach(btn => {
@@ -649,6 +666,7 @@ OUTPUT FORMAT (JSON):
                     btn.classList.add('active');
                 }
             });
+            updateCityFieldVisibility(pageType);
         });
     </script>
 </body>
