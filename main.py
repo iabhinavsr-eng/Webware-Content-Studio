@@ -375,6 +375,7 @@ def index():
     uvp = ""
     city = ""
     service_name = ""
+    keywords = ""
     prompt_instructions = ""
     page_type = "homepage"
     model = "gpt-4.1-mini"
@@ -386,6 +387,7 @@ def index():
         uvp = request.form.get("uvp", "").strip()
         city = request.form.get("city", "").strip()
         service_name = request.form.get("service_name", "").strip()
+        keywords = request.form.get("keywords", "").strip()
         prompt_instructions = request.form.get("prompt_instructions", "").strip()
         page_type = request.form.get("page_type", "homepage").strip()
         model = request.form.get("model", "").strip() or "gpt-4.1-mini"
@@ -396,11 +398,26 @@ def index():
 
         try:
             # Build user message based on page type
+            # Build keywords section if provided
+            keywords_section = ""
+            if keywords:
+                keywords_section = f"""
+TARGET KEYWORDS (integrate naturally using SEO best practices):
+{keywords}
+
+Important keyword integration rules:
+- Use primary keywords in headlines and first paragraphs where natural
+- Distribute keywords throughout content without keyword stuffing
+- Use variations and synonyms to avoid repetition
+- Ensure keywords flow naturally within sentences
+- Include keywords in subheadings where appropriate
+"""
+            
             if page_type == "service_area" and city:
                 user_message = f"""Here is the current data:
 
 TARGET LOCATION: {city}
-
+{keywords_section}
 Important: Generate content specifically for {city}. Include real local context such as:
 - Local climate and weather patterns that affect property maintenance
 - Common property types and issues in the area
@@ -416,7 +433,7 @@ UVP:
                 user_message = f"""Here is the current data:
 
 TARGET SERVICE: {service_name}
-
+{keywords_section}
 Important: Generate content specifically for the {service_name} service. Focus on:
 - What this specific service entails
 - Benefits specific to this service
@@ -432,7 +449,7 @@ UVP:
                 user_message = f"""Here is the current data:
 
 TARGET LOCATION: {city}
-
+{keywords_section}
 Important: Generate a services overview page for {city}. Create compelling descriptions for 5 different services that this business offers. Each service should:
 - Have a clear, specific title
 - Include a detailed 4-6 sentence description
@@ -445,7 +462,7 @@ ICP:
 UVP:
 {uvp}"""
             else:
-                user_message = f"Here is the current data:\n\nICP:\n{icp}\n\nUVP:\n{uvp}"
+                user_message = f"Here is the current data:\n{keywords_section}\nICP:\n{icp}\n\nUVP:\n{uvp}"
             
             model_output = call_openai(prompt_instructions, user_message, model)
             
@@ -486,6 +503,7 @@ UVP:
         uvp=uvp,
         city=city,
         service_name=service_name,
+        keywords=keywords,
         prompt_instructions=prompt_instructions,
         prompt_instructions_prose=prompt_instructions_prose,
         page_type=page_type,
