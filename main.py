@@ -379,6 +379,8 @@ def index():
     page_type = "homepage"
     model = "gpt-4.1-mini"
 
+    longform_mode = False
+    
     if request.method == "POST":
         icp = request.form.get("icp", "").strip()
         uvp = request.form.get("uvp", "").strip()
@@ -387,6 +389,7 @@ def index():
         prompt_instructions = request.form.get("prompt_instructions", "").strip()
         page_type = request.form.get("page_type", "homepage").strip()
         model = request.form.get("model", "").strip() or "gpt-4.1-mini"
+        longform_mode = request.form.get("longform_mode") == "on"
 
         if not prompt_instructions:
             prompt_instructions = get_default_prompt(page_type)
@@ -488,6 +491,7 @@ UVP:
         page_type=page_type,
         default_prompt=get_default_prompt(page_type),
         model=model,
+        longform_mode=longform_mode,
     )
 
 

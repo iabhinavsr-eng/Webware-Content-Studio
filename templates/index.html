@@ -177,6 +177,14 @@
                     <input type="hidden" name="prompt_instructions" id="prompt_instructions" value="{{ prompt_instructions or '' }}">
                 </div>
 
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.85rem; margin: 0;">
+                        <input type="checkbox" name="longform_mode" id="longform_mode" {% if longform_mode %}checked{% endif %} style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-weight: 600; color: #1e293b;">Long Form Mode</span>
+                    </label>
+                    <small style="color: #64748b; font-size: 0.7rem;">(2500-3500 words with explicit word targets per section)</small>
+                </div>
+
                 <input type="hidden" name="model" value="gpt-4.1-mini">
 
                 <button type="submit" class="submit-btn" id="submitBtn">Generate Content</button>
@@ -219,7 +227,83 @@
                 <div class="error-box">{{ error }}</div>
                 {% endif %}
 
-                {% if parsed_output and page_type == 'homepage' %}
+                {% if parsed_output and parsed_output.sections %}
+                <!-- LONGFORM PREVIEW -->
+                <div class="website-preview longform-preview">
+                    {% for section in parsed_output.sections %}
+                    {% if section.type == 'hero' %}
+                    <div class="hero-section">
+                        <h1>{{ section.headline }}</h1>
+                        <p>{{ section.content }}</p>
+                    </div>
+                    {% elif section.type == 'guide' %}
+                    <div class="blog-section">
+                        <h2>{{ section.headline }}</h2>
+                        <p>{{ section.content }}</p>
+                    </div>
+                    {% elif section.type == 'benefit' %}
+                    <div class="value-prop">
+                        <div class="value-prop-image">[Image]</div>
+                        <div class="value-prop-content">
+                            <h3>{{ section.headline }}</h3>
+                            <p>{{ section.content }}</p>
+                            {% if section.testimonial_quote %}
+                            <p class="testimonial">{{ section.testimonial_quote }}</p>
+                            <span class="testimonial-name">{{ section.testimonial_name }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% elif section.type == 'overview' or section.type == 'approach' %}
+                    <div class="section-block">
+                        {% if section.headline %}<h2 style="font-size: 1.5rem; margin-bottom: 1rem;">{{ section.headline }}</h2>{% endif %}
+                        <p>{{ section.content }}</p>
+                    </div>
+                    {% elif section.type == 'benefits' %}
+                    <div class="value-prop" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; padding: 2rem 0;">
+                        {% for benefit in section.benefits %}
+                        <div class="benefit-card" style="background: #1e293b; color: white; padding: 1.5rem;">
+                            <h4 style="font-size: 1rem; font-style: italic; margin-bottom: 0.75rem; color: white;">{{ benefit.headline }}</h4>
+                            <p style="font-size: 0.85rem; color: #e2e8f0; line-height: 1.6;">{{ benefit.content }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% elif section.type == 'details' %}
+                    <div class="section-block" style="background: #f8fafc; padding: 2rem;">
+                        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">{{ section.headline }}</h2>
+                        <p>{{ section.content }}</p>
+                    </div>
+                    {% elif section.type == 'services' %}
+                    <div class="services-grid" style="padding: 2rem 0;">
+                        {% if section.headline %}<h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">{{ section.headline }}</h2>{% endif %}
+                        {% for service in section.services %}
+                        <div class="service-card" style="background: #1e293b; color: white; padding: 1.5rem; margin-bottom: 1rem;">
+                            <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem; color: white;">{{ service.title }}</h3>
+                            <p style="color: #e2e8f0; line-height: 1.6;">{{ service.content }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% elif section.type == 'faq' %}
+                    <div class="faq-section" style="background: #f8fafc; padding: 2rem;">
+                        <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Frequently Asked Questions</h2>
+                        {% for faq in section.faqs %}
+                        <div class="faq-item" style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;">
+                            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">{{ faq.question }}</h4>
+                            <p style="color: #475569;">{{ faq.answer }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% elif section.type == 'cta' %}
+                    <div class="final-cta">
+                        <h2>{{ section.headline }}</h2>
+                        <p>{{ section.content }}</p>
+                        {% if section.button_text %}<span class="cta-button">{{ section.button_text }}</span>{% endif %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <div class="footer-bar"></div>
+                </div>
+
+                {% elif parsed_output and page_type == 'homepage' %}
                 <!-- HOMEPAGE PREVIEW -->
                 <div class="website-preview">
                     <div class="hero-section">
@@ -675,6 +759,181 @@ Each service description should be unique and compelling.
 Focus on benefits and value to the customer.`
         };
 
+        const PRESETS_JSON_LONGFORM = {
+            homepage: `
+
+OUTPUT FORMAT (JSON) - LONG FORM MODE:
+
+You MUST write extensive content. Each "content" field must be 400-600 words minimum. Total output should be 2500-3500 words.
+
+{
+  "sections": [
+    {
+      "type": "hero",
+      "headline": "Main headline for the business",
+      "content": "Write 400-600 words: Comprehensive introduction explaining what the business does, who it helps, the problems they solve, the value they provide, and why customers should choose them. Include specific details, examples, and end with a call to action."
+    },
+    {
+      "type": "guide",
+      "headline": "Question-style headline about customer education",
+      "content": "Write 400-600 words: Detailed explanation of how your guide or resources help customers, what they will learn, common problems addressed, and the value of being informed."
+    },
+    {
+      "type": "benefit",
+      "headline": "First key benefit (2-4 words)",
+      "content": "Write 400-600 words: Deep exploration of this benefit with specific examples, how it helps customers, real scenarios, and why it matters.",
+      "testimonial_quote": "Customer testimonial quote",
+      "testimonial_name": "First name + last initial"
+    },
+    {
+      "type": "benefit",
+      "headline": "Second key benefit (2-4 words)",
+      "content": "Write 400-600 words: Deep exploration of this benefit with specific examples, how it helps customers, real scenarios, and why it matters.",
+      "testimonial_quote": "Customer testimonial quote",
+      "testimonial_name": "First name + last initial"
+    },
+    {
+      "type": "benefit",
+      "headline": "Third key benefit (2-4 words)",
+      "content": "Write 400-600 words: Deep exploration of this benefit with specific examples, how it helps customers, real scenarios, and why it matters.",
+      "testimonial_quote": "Customer testimonial quote",
+      "testimonial_name": "First name + last initial"
+    },
+    {
+      "type": "cta",
+      "headline": "Compelling call to action headline",
+      "content": "Write 200-300 words: Encouraging message about getting started, what to expect, and the benefits of taking action.",
+      "button_text": "CTA button text"
+    }
+  ]
+}`,
+            service_page: `
+
+OUTPUT FORMAT (JSON) - LONG FORM MODE:
+
+You MUST write extensive content. Each "content" field must be 400-600 words minimum. Total output should be 2500-3500 words.
+
+{
+  "sections": [
+    {
+      "type": "hero",
+      "headline": "Service page main headline",
+      "content": "Write 500-700 words: Comprehensive introduction to the service, who it's for, problems it solves, the approach, and the value provided."
+    },
+    {
+      "type": "overview",
+      "content": "Write 500-700 words: Detailed explanation of the service approach, methodology, what customers can expect, professionalism standards, and communication."
+    },
+    {
+      "type": "benefits",
+      "benefits": [
+        {"headline": "Benefit 1", "content": "Write 150-250 words explaining this benefit in detail."},
+        {"headline": "Benefit 2", "content": "Write 150-250 words explaining this benefit in detail."},
+        {"headline": "Benefit 3", "content": "Write 150-250 words explaining this benefit in detail."},
+        {"headline": "Benefit 4", "content": "Write 150-250 words explaining this benefit in detail."}
+      ]
+    },
+    {
+      "type": "details",
+      "headline": "Service Details",
+      "content": "Write 600-800 words: In-depth exploration of service details, processes, what's included, common scenarios, and use cases. Cover multiple aspects thoroughly."
+    },
+    {
+      "type": "faq",
+      "faqs": [
+        {"question": "FAQ 1", "answer": "Write 100-150 words with a comprehensive answer."},
+        {"question": "FAQ 2", "answer": "Write 100-150 words with a comprehensive answer."},
+        {"question": "FAQ 3", "answer": "Write 100-150 words with a comprehensive answer."},
+        {"question": "FAQ 4", "answer": "Write 100-150 words with a comprehensive answer."}
+      ]
+    },
+    {
+      "type": "cta",
+      "headline": "Call to action headline",
+      "content": "Write 150-200 words about getting started.",
+      "button_text": "CTA button text"
+    }
+  ]
+}`,
+            service_area: `
+
+OUTPUT FORMAT (JSON) - LONG FORM MODE:
+
+You MUST write extensive content. Each "content" field must be 400-600 words minimum. Total output should be 2500-3500 words.
+
+{
+  "sections": [
+    {
+      "type": "hero",
+      "headline": "Location-specific headline with business name and city",
+      "content": "Write 500-700 words: Comprehensive introduction about the service in this specific location, local expertise, understanding of local needs, and value to local customers."
+    },
+    {
+      "type": "overview",
+      "headline": "Compelling headline about local service",
+      "content": "Write 500-700 words: Detailed explanation of how the service helps local customers, what they can expect, local considerations, and the value provided."
+    },
+    {
+      "type": "approach",
+      "headline": "Headline about approach or methodology",
+      "content": "Write 500-700 words: In-depth explanation of the approach, what makes it valuable, how it addresses local customer needs, and specific processes."
+    },
+    {
+      "type": "services",
+      "services": [
+        {"title": "Service 1", "content": "Write 200-300 words describing this service and its local benefits."},
+        {"title": "Service 2", "content": "Write 200-300 words describing this service and its local benefits."},
+        {"title": "Service 3", "content": "Write 200-300 words describing this service and its local benefits."}
+      ]
+    },
+    {
+      "type": "benefits",
+      "headline": "Benefits headline",
+      "content": "Write 300-400 words introducing and explaining key benefits.",
+      "bullets": ["Benefit 1", "Benefit 2", "Benefit 3", "Benefit 4", "Benefit 5", "Benefit 6", "Benefit 7"]
+    },
+    {
+      "type": "cta",
+      "headline": "Newsletter or engagement headline",
+      "content": "Write 150-200 words about staying informed.",
+      "button_text": "CTA button text"
+    }
+  ]
+}`,
+            services_overview: `
+
+OUTPUT FORMAT (JSON) - LONG FORM MODE:
+
+You MUST write extensive content. Each "content" field must be 400-600 words minimum. Total output should be 2500-3500 words.
+
+{
+  "sections": [
+    {
+      "type": "hero",
+      "headline": "[Service Category] Services in [City]",
+      "content": "Write 400-600 words: Comprehensive overview of all services provided, the location served, the business approach, and key value proposition."
+    },
+    {
+      "type": "services",
+      "headline": "Our Services",
+      "services": [
+        {"title": "Service 1", "content": "Write 300-500 words: Detailed description of this service, what it includes, the process, benefits, and who it's for."},
+        {"title": "Service 2", "content": "Write 300-500 words: Detailed description of this service, what it includes, the process, benefits, and who it's for."},
+        {"title": "Service 3", "content": "Write 300-500 words: Detailed description of this service, what it includes, the process, benefits, and who it's for."},
+        {"title": "Service 4", "content": "Write 300-500 words: Detailed description of this service, what it includes, the process, benefits, and who it's for."},
+        {"title": "Service 5", "content": "Write 300-500 words: Detailed description of this service, what it includes, the process, benefits, and who it's for."}
+      ]
+    },
+    {
+      "type": "cta",
+      "headline": "Ready to get started?",
+      "content": "Write 200-300 words encouraging consultation or contact.",
+      "button_text": "Request a consultation"
+    }
+  ]
+}`
+        };
+
         const PRESETS_JSON = {
             homepage: `
 
@@ -861,7 +1120,8 @@ OUTPUT FORMAT (JSON):
 
         function loadPreset(name) {
             const prose = PRESETS_PROSE[name];
-            const json = PRESETS_JSON[name];
+            const isLongform = document.getElementById('longform_mode').checked;
+            const json = isLongform ? PRESETS_JSON_LONGFORM[name] : PRESETS_JSON[name];
             if (prose) {
                 document.getElementById('prompt_display').value = prose;
                 document.getElementById('prompt_instructions').value = prose + json;
@@ -873,6 +1133,14 @@ OUTPUT FORMAT (JSON):
                 updateFieldVisibility(name);
             }
         }
+        
+        document.getElementById('longform_mode').addEventListener('change', function() {
+            const currentPageType = document.getElementById('page_type').value || 'homepage';
+            const prose = document.getElementById('prompt_display').value;
+            const isLongform = this.checked;
+            const json = isLongform ? PRESETS_JSON_LONGFORM[currentPageType] : PRESETS_JSON[currentPageType];
+            document.getElementById('prompt_instructions').value = prose + json;
+        });
 
         function updateFieldVisibility(pageType) {
             const cityField = document.getElementById('city-field');
@@ -1170,10 +1438,11 @@ OUTPUT FORMAT (JSON):
             // Initialize prompt display - use server value if exists, otherwise use default
             const serverProse = document.getElementById('prompt_display').value.trim();
             const serverFull = document.getElementById('prompt_instructions').value.trim();
+            const isLongform = document.getElementById('longform_mode').checked;
             
             if (!serverProse) {
                 const prose = PRESETS_PROSE[pageType];
-                const json = PRESETS_JSON[pageType];
+                const json = isLongform ? PRESETS_JSON_LONGFORM[pageType] : PRESETS_JSON[pageType];
                 if (prose) {
                     document.getElementById('prompt_display').value = prose;
                     document.getElementById('prompt_instructions').value = prose + json;
@@ -1183,7 +1452,8 @@ OUTPUT FORMAT (JSON):
             // Sync prompt_display changes to hidden field (append JSON)
             document.getElementById('prompt_display').addEventListener('input', function() {
                 const currentPageType = document.getElementById('page_type').value || 'homepage';
-                const currentJson = PRESETS_JSON[currentPageType];
+                const longformChecked = document.getElementById('longform_mode').checked;
+                const currentJson = longformChecked ? PRESETS_JSON_LONGFORM[currentPageType] : PRESETS_JSON[currentPageType];
                 document.getElementById('prompt_instructions').value = this.value + currentJson;
             });
         });
