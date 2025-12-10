@@ -349,7 +349,8 @@ def call_openai(system_prompt, user_prompt, model="gpt-4.1-mini"):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        temperature=0.2
+        temperature=0.2,
+        max_tokens=16000
     )
     return response.choices[0].message.content
 
