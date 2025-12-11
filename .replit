@@ -36,6 +36,7 @@ integrations = ["python_openai:1.0.0"]
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 33995
-externalPort = 3000
+[userenv]
+
+[userenv.shared]
+GUNICORN_CMD_ARGS = "--timeout=300"
