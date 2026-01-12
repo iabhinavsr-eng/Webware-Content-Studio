@@ -1461,6 +1461,15 @@ OUTPUT FORMAT (JSON):
                 const currentJson = longformChecked ? PRESETS_JSON_LONGFORM[currentPageType] : PRESETS_JSON[currentPageType];
                 document.getElementById('prompt_instructions').value = this.value + currentJson;
             });
+            
+            // Ensure prompt is synced before form submission
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const currentPageType = document.getElementById('page_type').value || 'homepage';
+                const longformChecked = document.getElementById('longform_mode').checked;
+                const currentJson = longformChecked ? PRESETS_JSON_LONGFORM[currentPageType] : PRESETS_JSON[currentPageType];
+                const proseValue = document.getElementById('prompt_display').value;
+                document.getElementById('prompt_instructions').value = proseValue + currentJson;
+            });
         });
     </script>
 </body>
