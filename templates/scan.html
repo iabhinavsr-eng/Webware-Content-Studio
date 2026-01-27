@@ -206,7 +206,16 @@
                 <label for="scan-url">Website URL</label>
                 <input type="text" id="scan-url" placeholder="https://example.com" value="{{ url or '' }}">
             </div>
-            <button type="button" class="btn btn-primary" id="load-btn" style="width: 100%; margin-bottom: 1rem;">Load Website Screenshot</button>
+            <button type="button" class="btn btn-primary" id="load-btn" style="width: 100%; margin-bottom: 0.5rem;">Load Website Screenshot</button>
+            
+            <div style="text-align: center; font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem;">or</div>
+            
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label for="upload-screenshot" style="display: block; text-align: center; padding: 0.75rem; border: 2px dashed #d1d5db; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s;" id="upload-label">
+                    Upload Your Own Screenshot
+                </label>
+                <input type="file" id="upload-screenshot" accept="image/*" style="display: none;">
+            </div>
             
             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 1rem 0;">
             
@@ -266,12 +275,66 @@
             document.getElementById('load-btn').addEventListener('click', loadScreenshot);
             document.getElementById('clear-boxes-btn').addEventListener('click', clearAllBoxes);
             document.getElementById('generate-all-btn').addEventListener('click', generateAllContent);
+            document.getElementById('upload-screenshot').addEventListener('change', handleUpload);
+            
+            const uploadLabel = document.getElementById('upload-label');
+            uploadLabel.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#3b82f6';
+                this.style.background = '#f0f9ff';
+            });
+            uploadLabel.addEventListener('dragleave', function(e) {
+                this.style.borderColor = '#d1d5db';
+                this.style.background = 'transparent';
+            });
+            uploadLabel.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#d1d5db';
+                this.style.background = 'transparent';
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    document.getElementById('upload-screenshot').files = files;
+                    handleUpload({ target: { files: files } });
+                }
+            });
             
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', endDrawing);
             canvas.addEventListener('mouseleave', endDrawing);
         });
+        
+        function handleUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = document.getElementById('screenshot-img');
+                const emptyState = document.getElementById('empty-state');
+                
+                img.onload = function() {
+                    emptyState.style.display = 'none';
+                    img.style.display = 'block';
+                    canvas.style.display = 'block';
+                    
+                    canvas.width = img.offsetWidth;
+                    canvas.height = img.offsetHeight;
+                    
+                    screenshotLoaded = true;
+                    clearAllBoxes();
+                    updateStatus('Screenshot uploaded. Draw rectangles to select content areas.');
+                };
+                
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
         
         function loadScreenshot() {
             let url = document.getElementById('scan-url').value.trim();
