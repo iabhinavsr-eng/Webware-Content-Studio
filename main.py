@@ -2,7 +2,7 @@ import json
 import logging
 import os
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 
 logging.basicConfig(level=logging.DEBUG)
@@ -511,6 +511,75 @@ UVP:
         model=model,
         longform_mode=longform_mode,
     )
+
+
+@app.route("/scan", methods=["GET"])
+def scan():
+    return render_template("scan.html")
+
+
+@app.route("/scan/generate", methods=["POST"])
+def scan_generate():
+    try:
+        data = request.get_json()
+        icp = data.get("icp", "")
+        uvp = data.get("uvp", "")
+        keywords = data.get("keywords", "")
+        areas = data.get("areas", [])
+        
+        if not areas:
+            return jsonify({"error": "No areas provided"})
+        
+        keywords_section = ""
+        if keywords:
+            keywords_section = f"""
+Target Keywords (integrate naturally):
+{keywords}
+"""
+        
+        system_prompt = f"""You are an expert SEO website copywriter. Generate content for specific areas of a website.
+
+RULES:
+- Use British English
+- Professional, direct tone
+- No hype language
+- Integrate keywords naturally
+- Output plain text only (no markdown, no formatting)
+
+ICP (Ideal Customer Profile):
+{icp}
+
+UVP (Unique Value Proposition):
+{uvp}
+{keywords_section}
+For each area, generate appropriate content based on the description provided. Keep content concise and focused on the specific element type (headline, paragraph, CTA, etc.).
+"""
+        
+        results = []
+        for area in areas:
+            user_message = f"""Generate content for Area {area['areaNumber']}:
+
+Description: {area['description']}
+
+Provide ONLY the content text, no labels or explanations. Match the content type described (if it's a headline, write a headline; if it's a paragraph, write a paragraph, etc.)."""
+            
+            try:
+                content = call_openai(system_prompt, user_message, "gpt-4.1-mini")
+                results.append({
+                    "id": area["id"],
+                    "content": content
+                })
+            except Exception as e:
+                results.append({
+                    "id": area["id"],
+                    "content": f"Error: {str(e)}"
+                })
+        
+        return jsonify({"results": results})
+        
+    except Exception as e:
+        logging.error(f"Scan generate error: {e}")
+        return jsonify({"error": str(e)})
 
 
 if __name__ == "__main__":
