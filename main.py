@@ -387,11 +387,12 @@ def index():
     city = ""
     service_name = ""
     keywords = ""
-    prompt_instructions = ""
     page_type = "homepage"
     model = "gpt-4.1-mini"
-
     longform_mode = False
+    
+    # Set default prompt for initial page load
+    prompt_instructions = get_default_prompt(page_type)
     
     if request.method == "POST":
         icp = request.form.get("icp", "").strip()
