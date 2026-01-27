@@ -317,6 +317,13 @@
                     <div class="hero-section">
                         <h1>{{ parsed_output.hero_section.h1 if parsed_output.hero_section else 'Your Headline Here' }}</h1>
                         <p>{{ parsed_output.hero_section.paragraph if parsed_output.hero_section else '' }}</p>
+                        {% if parsed_output.hero_section and parsed_output.hero_section.benefits_list %}
+                        <ul style="list-style: none; padding: 0; margin: 1rem 0;">
+                            {% for benefit in parsed_output.hero_section.benefits_list %}
+                            <li style="padding: 0.25rem 0;">- {{ benefit }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
                     </div>
 
                     {% if parsed_output.blog_guide_section %}
