@@ -183,6 +183,12 @@
             --box-5: #8b5cf6;
             --box-6: #ec4899;
         }
+        
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(150%); }
+            100% { transform: translateX(-100%); }
+        }
     </style>
 </head>
 <body>
@@ -287,15 +293,35 @@
             }
             
             const loadBtn = document.getElementById('load-btn');
+            const emptyState = document.getElementById('empty-state');
             loadBtn.textContent = 'Loading...';
             loadBtn.disabled = true;
             
-            const encodedUrl = encodeURIComponent(url);
-            const screenshotUrl = `https://image.thum.io/get/width/1200/crop/900/${url}`;
+            emptyState.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">Loading Screenshot...</div>
+                    <p style="color: #64748b;">This may take 10-30 seconds for new websites</p>
+                    <div style="margin-top: 1rem; width: 200px; height: 4px; background: #e2e8f0; border-radius: 4px; margin: 1rem auto; overflow: hidden;">
+                        <div style="height: 100%; background: #3b82f6; animation: loading 1.5s ease-in-out infinite; width: 40%;"></div>
+                    </div>
+                </div>
+            `;
+            
+            const screenshotUrl = `https://image.thum.io/get/width/1200/crop/900/noanimate/${url}`;
             const img = document.getElementById('screenshot-img');
             
+            let loadTimeout = setTimeout(function() {
+                emptyState.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #f59e0b;">Taking longer than expected...</div>
+                        <p style="color: #64748b;">The screenshot service is still processing. Please wait.</p>
+                    </div>
+                `;
+            }, 15000);
+            
             img.onload = function() {
-                document.getElementById('empty-state').style.display = 'none';
+                clearTimeout(loadTimeout);
+                emptyState.style.display = 'none';
                 img.style.display = 'block';
                 canvas.style.display = 'block';
                 
@@ -311,8 +337,14 @@
             };
             
             img.onerror = function() {
-                alert('Failed to load screenshot. Please check the URL and try again.');
-                loadBtn.textContent = 'Load Website Screenshot';
+                clearTimeout(loadTimeout);
+                emptyState.innerHTML = `
+                    <h3>Failed to Load Screenshot</h3>
+                    <p>The screenshot service could not capture this website.</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.8rem;">Try: Check URL is correct, or try a different website.</p>
+                `;
+                emptyState.style.display = 'flex';
+                loadBtn.textContent = 'Retry Screenshot';
                 loadBtn.disabled = false;
             };
             
