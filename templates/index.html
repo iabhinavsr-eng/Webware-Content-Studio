@@ -620,39 +620,51 @@
 
     <script>
         const PRESETS_PROSE = {
-            homepage: `SYSTEM PROMPT (Homepage Content Builder)
-
-Role:
-You are an expert website copywriter specialising in SEO-optimised homepage content, using structured inputs (ICP, UVP, and page SEO data) to produce clear, persuasive, conversion-focused content.
+            homepage: `Role: You are an expert website copywriter specialising in conversion-focused, SEO-optimised homepage content. You transform complex psychological and relational concepts into clear, scannable, and authoritative copy for high-level ICPs.
 
 Rules (MUST follow all):
-Language & Formatting
 
-Use British English.
+1. Language & Formatting
+
+Use British English (e.g., specialise, recognise, programme).
 
 Output standard ASCII only (no curly quotes, no emojis).
 
 Normalise whitespace (no double spaces, no trailing spaces).
 
-Do not mention phone numbers, emails, URLs, or the business address.
+Paragraph Limit: No paragraph may exceed 3 sentences. Use frequent line breaks to ensure mobile readability.
 
-Do not write the business name more than once in the entire content unless the input instructs otherwise.
+Lists: Use simple ASCII hyphens (-) for bulleted lists to break up dense information.
 
-No hype language (e.g., "world-class", "best ever").
+2. Brand Integrity
 
-Tone: professional, direct, trustworthy.
+Do not mention phone numbers, emails, URLs, or addresses.
 
-SEO & Content Requirements
+Mention the business name exactly once in the entire document.
 
-Use the provided H1, keywords, ICP, UVP, and any SEO page structure.
+No hype language (e.g., "world-class", "best ever", "unparalleled").
 
-Do not invent new services, locations, or claims.
+Tone: Professional, direct, and grounded in clinical/somatic authority.
 
-Do not include geographic references unless they appear in the service areas list.
+3. SEO & Structural Logic
 
-Naturally weave relevant keywords into the content without over-optimising.
+H1 Requirement: Must include the primary keyword and clearly identify the target audience within the first 7 words.
 
-DO NOT include keywords as a list; integrate them in context.`,
+The "F-Pattern" Rule: Front-load the most important keywords and benefits at the start of paragraphs and headings.
+
+Active Voice: Use active, directive verbs (e.g., "Regulate," "Build," "Resolve") rather than passive descriptions.
+
+Keyword Integration: Weave keywords naturally. If a keyword is provided in the input, ensure it appears in at least one H2 and its following body text.
+
+Internal Linking Potential: Use bolding on key industry terms (e.g., nervous system regulation) to signal topical relevance.
+
+4. Content Flow
+
+Hero Section: One punchy H1, followed by a maximum of 3 short sentences, then a 3-point bulleted list of immediate benefits.
+
+Value Propositions: Headline (H2) must be benefit-driven. Body text must explain the "How" and the "Outcome."
+
+Testimonials: Include names as provided, but format them clearly to separate them from body copy.`,
 
             service_page: `Role:
 You are an expert SEO website copywriter.
@@ -780,45 +792,42 @@ Focus on benefits and value to the customer.`
 OUTPUT FORMAT (JSON) - LONG FORM MODE:
 
 You MUST write extensive content. Each "content" field must be 400-600 words minimum. Total output should be 2500-3500 words.
+Remember: No paragraph may exceed 3 sentences. Use frequent line breaks. Front-load keywords using F-Pattern.
 
 {
   "sections": [
     {
       "type": "hero",
-      "headline": "Main headline for the business",
-      "content": "Write 400-600 words: Comprehensive introduction explaining what the business does, who it helps, the problems they solve, the value they provide, and why customers should choose them. Include specific details, examples, and end with a call to action."
-    },
-    {
-      "type": "guide",
-      "headline": "Question-style headline about customer education",
-      "content": "Write 400-600 words: Detailed explanation of how your guide or resources help customers, what they will learn, common problems addressed, and the value of being informed."
+      "headline": "Main headline (primary keyword + target audience in first 7 words)",
+      "content": "Write 400-600 words: Comprehensive introduction explaining what the business does, who it helps, the problems they solve. Use active voice and front-load benefits.",
+      "benefits_list": ["Benefit 1", "Benefit 2", "Benefit 3"]
     },
     {
       "type": "benefit",
-      "headline": "First key benefit (2-4 words)",
-      "content": "Write 400-600 words: Deep exploration of this benefit with specific examples, how it helps customers, real scenarios, and why it matters.",
+      "headline": "Benefit-driven H2 headline (first key benefit)",
+      "content": "Write 400-600 words: Explain the How and the Outcome. Deep exploration with specific examples. Max 3 sentences per paragraph.",
       "testimonial_quote": "Customer testimonial quote",
       "testimonial_name": "First name + last initial"
     },
     {
       "type": "benefit",
-      "headline": "Second key benefit (2-4 words)",
-      "content": "Write 400-600 words: Deep exploration of this benefit with specific examples, how it helps customers, real scenarios, and why it matters.",
+      "headline": "Benefit-driven H2 headline (second key benefit)",
+      "content": "Write 400-600 words: Explain the How and the Outcome. Deep exploration with specific examples. Max 3 sentences per paragraph.",
       "testimonial_quote": "Customer testimonial quote",
       "testimonial_name": "First name + last initial"
     },
     {
       "type": "benefit",
-      "headline": "Third key benefit (2-4 words)",
-      "content": "Write 400-600 words: Deep exploration of this benefit with specific examples, how it helps customers, real scenarios, and why it matters.",
+      "headline": "Benefit-driven H2 headline (third key benefit)",
+      "content": "Write 400-600 words: Explain the How and the Outcome. Deep exploration with specific examples. Max 3 sentences per paragraph.",
       "testimonial_quote": "Customer testimonial quote",
       "testimonial_name": "First name + last initial"
     },
     {
       "type": "cta",
-      "headline": "Compelling call to action headline",
-      "content": "Write 200-300 words: Encouraging message about getting started, what to expect, and the benefits of taking action.",
-      "button_text": "CTA button text"
+      "headline": "Action-oriented question or statement",
+      "content": "Write 200-300 words: Encouraging message about getting started. Use active verbs.",
+      "button_text": "CTA button text (active verb)"
     }
   ]
 }`,
@@ -954,41 +963,36 @@ You MUST write extensive content. Each "content" field must be 400-600 words min
 
 Homepage Structure (MUST output all sections):
 
-*** CRITICAL WORD COUNT RULE: If the rules above specify a word count (e.g., "3000 words"), you MUST reach that total. Each "paragraph" or "content" field below can and SHOULD contain multiple long paragraphs (3-10 paragraphs each, 100-300 words per paragraph) to meet the word count. Write extensively and in depth. Do NOT write short content when a word count is specified. ***
-
 Your output must be valid JSON with these exact keys:
 
 {
   "hero_section": {
-    "h1": "Main headline",
-    "paragraph": "Extended content: Multiple paragraphs explaining what the business does, who it helps, the problems solved, and ending with a CTA. Write extensively."
-  },
-  "blog_guide_section": {
-    "headline": "Question-style headline about property maintenance",
-    "paragraph": "Extended content: Multiple paragraphs about how the guide helps customers, what they'll learn, and why it matters."
+    "h1": "Main headline (primary keyword + target audience in first 7 words)",
+    "paragraph": "2-3 sentences max explaining what the business does and who it helps.",
+    "benefits_list": ["Benefit 1", "Benefit 2", "Benefit 3"]
   },
   "value_prop_1": {
-    "headline": "Short benefit headline (2-4 words)",
-    "paragraph": "Extended content: Multiple paragraphs deeply exploring this benefit with examples and details.",
-    "testimonial_quote": "Testimonial quote",
+    "headline": "Benefit-driven H2 headline",
+    "paragraph": "2-3 sentences explaining the How and the Outcome.",
+    "testimonial_quote": "1 sentence testimonial",
     "testimonial_name": "First name + last initial"
   },
   "value_prop_2": {
-    "headline": "Short benefit headline",
-    "paragraph": "Extended content: Multiple paragraphs deeply exploring this benefit with examples and details.",
-    "testimonial_quote": "Testimonial quote",
+    "headline": "Benefit-driven H2 headline",
+    "paragraph": "2-3 sentences explaining the How and the Outcome.",
+    "testimonial_quote": "1 sentence testimonial",
     "testimonial_name": "First name + last initial"
   },
   "value_prop_3": {
-    "headline": "Short benefit headline",
-    "paragraph": "Extended content: Multiple paragraphs deeply exploring this benefit with examples and details.",
-    "testimonial_quote": "Testimonial quote",
+    "headline": "Benefit-driven H2 headline",
+    "paragraph": "2-3 sentences explaining the How and the Outcome.",
+    "testimonial_quote": "1 sentence testimonial",
     "testimonial_name": "First name + last initial"
   },
   "final_cta_section": {
-    "headline": "Question encouraging action",
-    "paragraph": "Extended content: Multiple paragraphs about getting started, the process, and what to expect.",
-    "button_text": "CTA button text"
+    "headline": "Action-oriented question or statement",
+    "paragraph": "2-3 sentences about getting started.",
+    "button_text": "CTA button text (active verb)"
   }
 }`,
             service_page: `
