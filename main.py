@@ -520,6 +520,45 @@ def scan():
     return render_template("scan.html")
 
 
+def is_safe_url(url_string):
+    """Check if URL is safe (not internal/private IP)."""
+    from urllib.parse import urlparse
+    import socket
+    import ipaddress
+    
+    try:
+        parsed = urlparse(url_string)
+        
+        if parsed.scheme not in ('http', 'https'):
+            return False, "Only HTTP and HTTPS URLs are allowed"
+        
+        hostname = parsed.hostname
+        if not hostname:
+            return False, "Invalid URL"
+        
+        if len(url_string) > 2000:
+            return False, "URL too long"
+        
+        blocked_hosts = ['localhost', '127.0.0.1', '0.0.0.0', '::1']
+        if hostname.lower() in blocked_hosts:
+            return False, "Cannot access local addresses"
+        
+        try:
+            ip_addr = socket.gethostbyname(hostname)
+            ip_obj = ipaddress.ip_address(ip_addr)
+            
+            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved:
+                return False, "Cannot access private or internal addresses"
+                
+        except socket.gaierror:
+            pass
+        
+        return True, None
+        
+    except Exception:
+        return False, "Invalid URL format"
+
+
 @app.route("/scan/screenshot", methods=["POST"])
 def scan_screenshot():
     try:
@@ -532,23 +571,29 @@ def scan_screenshot():
         if not url.startswith("http://") and not url.startswith("https://"):
             url = "https://" + url
         
+        is_safe, error_msg = is_safe_url(url)
+        if not is_safe:
+            return jsonify({"error": error_msg}), 400
+        
         from playwright.sync_api import sync_playwright
         
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            page = browser.new_page(viewport={"width": 1280, "height": 900})
+            context = browser.new_context(viewport={"width": 1280, "height": 900})
+            page = context.new_page()
             
             try:
                 page.goto(url, timeout=30000, wait_until="networkidle")
-            except Exception as e:
-                logging.warning(f"Navigation warning (continuing anyway): {e}")
+            except Exception:
                 try:
                     page.goto(url, timeout=30000, wait_until="domcontentloaded")
-                except Exception as e2:
+                except Exception:
+                    context.close()
                     browser.close()
-                    return jsonify({"error": f"Could not load website: {str(e2)}"}), 400
+                    return jsonify({"error": "Could not load website. Check the URL and try again."}), 400
             
             screenshot_bytes = page.screenshot(full_page=False)
+            context.close()
             browser.close()
         
         screenshot_base64 = base64.b64encode(screenshot_bytes).decode('utf-8')
@@ -560,7 +605,7 @@ def scan_screenshot():
         
     except Exception as e:
         logging.error(f"Screenshot error: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Failed to capture screenshot. Please try again."}), 500
 
 
 @app.route("/scan/generate", methods=["POST"])
