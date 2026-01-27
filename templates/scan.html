@@ -336,7 +336,7 @@
             reader.readAsDataURL(file);
         }
         
-        function loadScreenshot() {
+        async function loadScreenshot() {
             let url = document.getElementById('scan-url').value.trim();
             if (!url) {
                 alert('Please enter a URL');
@@ -357,61 +357,70 @@
             
             const loadBtn = document.getElementById('load-btn');
             const emptyState = document.getElementById('empty-state');
-            loadBtn.textContent = 'Loading...';
+            loadBtn.textContent = 'Capturing...';
             loadBtn.disabled = true;
             
             emptyState.innerHTML = `
                 <div style="text-align: center;">
-                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">Loading Screenshot...</div>
-                    <p style="color: #64748b;">This may take 10-30 seconds for new websites</p>
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">Capturing Website...</div>
+                    <p style="color: #64748b;">This may take 10-30 seconds</p>
                     <div style="margin-top: 1rem; width: 200px; height: 4px; background: #e2e8f0; border-radius: 4px; margin: 1rem auto; overflow: hidden;">
                         <div style="height: 100%; background: #3b82f6; animation: loading 1.5s ease-in-out infinite; width: 40%;"></div>
                     </div>
                 </div>
             `;
+            emptyState.style.display = 'flex';
             
-            const screenshotUrl = `https://image.thum.io/get/width/1200/crop/900/noanimate/${url}`;
-            const img = document.getElementById('screenshot-img');
-            
-            let loadTimeout = setTimeout(function() {
-                emptyState.innerHTML = `
-                    <div style="text-align: center;">
-                        <div style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #f59e0b;">Taking longer than expected...</div>
-                        <p style="color: #64748b;">The screenshot service is still processing. Please wait.</p>
-                    </div>
-                `;
-            }, 15000);
-            
-            img.onload = function() {
-                clearTimeout(loadTimeout);
-                emptyState.style.display = 'none';
-                img.style.display = 'block';
-                canvas.style.display = 'block';
+            try {
+                const response = await fetch('/scan/screenshot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
                 
-                canvas.width = img.offsetWidth;
-                canvas.height = img.offsetHeight;
+                const data = await response.json();
                 
-                screenshotLoaded = true;
-                loadBtn.textContent = 'Load Website Screenshot';
-                loadBtn.disabled = false;
+                if (data.error) {
+                    emptyState.innerHTML = `
+                        <h3>Failed to Load Screenshot</h3>
+                        <p>${data.error}</p>
+                        <p style="margin-top: 0.5rem; font-size: 0.8rem;">Try: Check URL is correct, or upload your own screenshot.</p>
+                    `;
+                    emptyState.style.display = 'flex';
+                    loadBtn.textContent = 'Retry Screenshot';
+                    loadBtn.disabled = false;
+                    return;
+                }
                 
-                clearAllBoxes();
-                updateStatus('Screenshot loaded. Draw rectangles to select content areas.');
-            };
-            
-            img.onerror = function() {
-                clearTimeout(loadTimeout);
+                const img = document.getElementById('screenshot-img');
+                img.onload = function() {
+                    emptyState.style.display = 'none';
+                    img.style.display = 'block';
+                    canvas.style.display = 'block';
+                    
+                    canvas.width = img.offsetWidth;
+                    canvas.height = img.offsetHeight;
+                    
+                    screenshotLoaded = true;
+                    loadBtn.textContent = 'Load Website Screenshot';
+                    loadBtn.disabled = false;
+                    
+                    clearAllBoxes();
+                    updateStatus('Screenshot loaded. Draw rectangles to select content areas.');
+                };
+                
+                img.src = data.screenshot;
+                
+            } catch (err) {
                 emptyState.innerHTML = `
                     <h3>Failed to Load Screenshot</h3>
-                    <p>The screenshot service could not capture this website.</p>
-                    <p style="margin-top: 0.5rem; font-size: 0.8rem;">Try: Check URL is correct, or try a different website.</p>
+                    <p>Error: ${err.message}</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.8rem;">Try: Check URL is correct, or upload your own screenshot.</p>
                 `;
                 emptyState.style.display = 'flex';
                 loadBtn.textContent = 'Retry Screenshot';
                 loadBtn.disabled = false;
-            };
-            
-            img.src = screenshotUrl;
+            }
         }
         
         function startDrawing(e) {

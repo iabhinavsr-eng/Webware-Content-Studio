@@ -2,8 +2,10 @@ import json
 import logging
 import os
 
-from flask import Flask, render_template, request, jsonify
+import base64
+from flask import Flask, render_template, request, jsonify, send_file
 from openai import OpenAI
+from io import BytesIO
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -516,6 +518,49 @@ UVP:
 @app.route("/scan", methods=["GET"])
 def scan():
     return render_template("scan.html")
+
+
+@app.route("/scan/screenshot", methods=["POST"])
+def scan_screenshot():
+    try:
+        data = request.get_json()
+        url = data.get("url", "").strip()
+        
+        if not url:
+            return jsonify({"error": "URL is required"}), 400
+        
+        if not url.startswith("http://") and not url.startswith("https://"):
+            url = "https://" + url
+        
+        from playwright.sync_api import sync_playwright
+        
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page(viewport={"width": 1280, "height": 900})
+            
+            try:
+                page.goto(url, timeout=30000, wait_until="networkidle")
+            except Exception as e:
+                logging.warning(f"Navigation warning (continuing anyway): {e}")
+                try:
+                    page.goto(url, timeout=30000, wait_until="domcontentloaded")
+                except Exception as e2:
+                    browser.close()
+                    return jsonify({"error": f"Could not load website: {str(e2)}"}), 400
+            
+            screenshot_bytes = page.screenshot(full_page=False)
+            browser.close()
+        
+        screenshot_base64 = base64.b64encode(screenshot_bytes).decode('utf-8')
+        
+        return jsonify({
+            "success": True,
+            "screenshot": f"data:image/png;base64,{screenshot_base64}"
+        })
+        
+    except Exception as e:
+        logging.error(f"Screenshot error: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/scan/generate", methods=["POST"])
